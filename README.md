@@ -2,8 +2,8 @@
 
 
 - Writes a parser to read data that is compatible with Compass raw data output.
-- Plot the pulse height distribution, pulse integral distribution and pulse shape discrimination (PSD).
-- Implements the CFD algorithm based on interpolation and plot the time difference histogram and fit.
+- Plots the pulse height distribution, pulse integral distribution and performs pulse shape discrimination (PSD).
+- Implements the constant fraction discrimination (CFD) algorithm based on interpolation and plots the time difference histogram and its fit.
 
 ## Before runnning
 
