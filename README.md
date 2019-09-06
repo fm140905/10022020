@@ -1,9 +1,10 @@
 # Pulse processing program based on the ROOT framework
 
-- Write a parser to read the data saved using CoMPASS.
-- Implement the CFD algorithm based on interpolation.
-- Find time differences between the coincident events from two channels.
-- Draw the histogram and fit.
+
+- Writes a parser to read the data saved using CoMPASS .
+- Implements the CFD algorithm based on interpolation.
+- Finds the time differences between the coincident events from two channels.
+- Draws the histogram and fit.
 
 ## Parser
 
@@ -25,3 +26,8 @@
 - Sometimes the file is too lagre to be processed at one time (a few GB). In this case, you can split the file into several parts and process them seperately. Or you can use a small `MaxNumPulses`.
 - Open a terminal, type `./main` to run.
 - Use `Ctrl`+ `c` to quit.
+
+## Use
+If you use part of this software, please cite the following paper
+Fang, M., Bartholomew, N., Di Fulvio, A. Positron annihilation lifetime spectroscopy using fast scintillators and digital electronics
+(2019) Nuclear Instruments and Methods in Physics Research, Section A: Accelerators, Spectrometers, Detectors and Associated Equipment, 943, art. no. 162507.
