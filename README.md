@@ -7,7 +7,7 @@
 
 ## Before runnning
 
-- Make sure you have installed ROOT and your OS is linux.
+- Make sure you have installed ROOT and your OS is linux. We use ROOT 6.14/04 and Ubuntu 16.04 LTS.
 - Download the `input.txt` file and `main` file in `\bin` folder. Put them in the same directory.
 - Create a folder named `output` in your current directory.
 
