@@ -53,11 +53,12 @@ int getInputParameters(std::string filepath, Parameters &setting)
                          "Channels: ", "Filetype: ", "Coincidence: ",
                          "Coincidence Channels: ", "Time Window: ", "Filter Width: ",
                          "Fraction: ","Time Delay: ","Interpolation: ", "SaveDT: ",
-                         "TOF: ", "SaveTOF: ", "Calibration: ", "EnergyCut: ",
+                         "TOF: ", "SaveTOF: ", "CalibrationPID: ", "EnergyCut: ",
                          "EnergyLow: ","EnergyHigh: ","PSDCut: ","PSDLow: ",
                          "PSDHigh: ","SavePH: ","SavePI: ","PIDBins: ","PImin: ","PImax: ",
                          "PHDBins: ","PHmin: ","PHmax: ", "TRise: ","PSDXBins: ",
-                         "PSDXmin: ","PSDXmax: ","PSDYBins: ","PSDYmin: ","PSDYmax: "};
+                         "PSDXmin: ","PSDXmax: ","PSDYBins: ","PSDYmin: ","PSDYmax: ",
+                         "SaveHeaders: ", "Polarity: ","PreTrigger: ", "CalibrationPHD: "};
     while (getline(fileptr, line))
     {
         lines.push_back(line);
@@ -315,7 +316,7 @@ int getInputParameters(std::string filepath, Parameters &setting)
         {
             taglength = tag[31].length();
             setting.Directory = line.substr(taglength, std::string::npos);
-            setting.Directory = setting.Directory.substr(0, setting.Directory.length() - 1);
+            // setting.Directory = setting.Directory.substr(0, setting.Directory.length() - 1);
             //std::cout << line.substr(taglength,std::string::npos) << std::endl;
         }
         // 33th
@@ -450,7 +451,7 @@ int getInputParameters(std::string filepath, Parameters &setting)
             {
                 std::string substr;
                 getline(ss, substr, ',');
-                setting.Calicoefs.push_back(stof(substr));
+                setting.CalicoefsPID.push_back(stof(substr));
             }
             //std::cout << line.substr(taglength,std::string::npos) << std::endl;
         }
@@ -620,6 +621,48 @@ int getInputParameters(std::string filepath, Parameters &setting)
         {
             taglength = tag[66].length();
             setting.PSDYmax= stof(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 68th
+        else if (line.find(tag[67]) == 0)
+        {
+            taglength = tag[67].length();
+            // setting.Headersize = stoi(line.substr(taglength, std::string::npos));
+            std::string strTemp = line.substr(taglength, std::string::npos);
+            std::stringstream ss(strTemp);
+            while (ss.good())
+            {
+                std::string substr;
+                getline(ss, substr, ',');
+                setting.SaveHeaders.push_back(stoi(substr));
+            }
+        }
+        // 69th
+        else if (line.find(tag[68]) == 0)
+        {
+            taglength = tag[68].length();
+            setting.Polarity= stoi(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 70th
+        else if (line.find(tag[69]) == 0)
+        {
+            taglength = tag[69].length();
+            setting.PreTrigger= stoi(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 71th
+        else if (line.find(tag[70]) == 0)
+        {
+            taglength = tag[70].length();
+            std::string strTemp = line.substr(taglength, std::string::npos);
+            std::stringstream ss(strTemp);
+            while (ss.good())
+            {
+                std::string substr;
+                getline(ss, substr, ',');
+                setting.CalicoefsPHD.push_back(stof(substr));
+            }
             //std::cout << line.substr(taglength,std::string::npos) << std::endl;
         }
         // add more options here.

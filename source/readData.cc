@@ -26,7 +26,7 @@ Int_t readTimeStamp( const Parameters &setting, std::vector< std::vector<UShort_
             {
                 std::ifstream fileptr;
                 fileptr.open(filepath, std::ios::in | std::ios::binary);
-                std::cout << "Trying to open binary file: " << filepath << std::endl;
+                std::cout << "Opening binary file: " << filepath << std::endl;
                 if (!fileptr.is_open())
                 {
                     std::cout << "Cannot open file! " << filepath << std::endl;
@@ -34,7 +34,7 @@ Int_t readTimeStamp( const Parameters &setting, std::vector< std::vector<UShort_
                 }
                 else
                 {
-                    std::cout << " Open success !" << " Trying to read data from file: " << std::endl;
+                    std::cout << " Open success !\n" << " Reading data: " << std::endl;
                 }
 
                 //Bool_t badflag=false;
@@ -85,6 +85,10 @@ Int_t readCoincidences(const Parameters &setting,
     std::string filepath;
     ULong64_t timestamptemp;
     std::vector<ULong64_t> timestampsTemp;
+    UShort_t EnergyLong;
+    std::vector<UShort_t> EnergyLongTemp;
+    UShort_t EnergyShort;
+    std::vector<UShort_t> EnergyShortTemp;
     UShort_t sample;
     std::vector<UShort_t> samples(setting.NSamples);
     std::vector<std::vector<UShort_t> > pulsesTemp;
@@ -94,11 +98,17 @@ Int_t readCoincidences(const Parameters &setting,
     UInt_t totalheadersize = std::accumulate(setting.Headersize.begin(),setting.Headersize.end(),0); // total header size
     UInt_t tailheadersize = std::accumulate(setting.Headersize.begin() + 3,setting.Headersize.end(),0); // size of Energy(ch) + Energy Short(ch) + Flags + Number of Samples
     UInt_t eventsize = totalheadersize + setting.NSamples * setting.Samplesize;
-    Int_t PreGate = 0;
-    if(setting.PreGate> PreGate) PreGate = setting.PreGate / setting.Delt;
+    
+    Int_t PreTrig = setting.PreTrigger / setting.Delt;
+    Int_t PreGate = setting.PreGate / setting.Delt;
+    PreGate = PreTrig - PreGate;
+    if(PreGate < 0) PreGate = 0;
     Int_t LongGate = setting.LongGate  / setting.Delt;
-    if(LongGate > setting.NSamples) LongGate = setting.NSamples;
+    LongGate += PreGate;
+    // if(LongGate > setting.NSamples) LongGate = setting.NSamples;
     Int_t ShortGate = setting.ShortGate / setting.Delt;
+    ShortGate += PreGate;
+    // if(ShortGate > setting.NSamples) ShortGate = setting.NSamples;
 
 
     //read the data
@@ -121,7 +131,7 @@ Int_t readCoincidences(const Parameters &setting,
             {
                 std::ifstream fileptr;
                 fileptr.open(filepath, std::ios::in | std::ios::binary);
-                std::cout << "Trying to open binary file: " << filepath << std::endl;
+                std::cout << "Opening binary file: " << filepath << std::endl;
                 if (!fileptr.is_open())
                 {
                     std::cout << "Cannot open file! " << filepath << std::endl;
@@ -129,7 +139,8 @@ Int_t readCoincidences(const Parameters &setting,
                 }
                 else
                 {
-                    std::cout << " Open success !" << " Trying to read data from file: " << std::endl;
+                    std::cout << " Open success !"<< std::endl;
+                    std::cout << " Reading data: "<< std::endl;
                 }
 
                 //Bool_t badflag=false;
@@ -150,8 +161,14 @@ Int_t readCoincidences(const Parameters &setting,
                     //fileptr.ignore(setting.Headersize);
                     fileptr.ignore(setting.Headersize[0] + setting.Headersize[1]);
                     fileptr.read((char *)&(timestamptemp), setting.Headersize[2]);
+                    fileptr.read((char *)&(EnergyLong), setting.Headersize[3]);
+                    fileptr.read((char *)&(EnergyShort), setting.Headersize[4]);
+                    
                     timestampsTemp.push_back(timestamptemp);
-                    fileptr.ignore(tailheadersize);
+                    EnergyLongTemp.push_back(EnergyLong);
+                    EnergyShortTemp.push_back(EnergyShort);
+                    fileptr.ignore(setting.Headersize[5] + setting.Headersize[6]);
+
 
                     //read samples
                     for (int k = 0; k != setting.NSamples && !fileptr.eof(); k++)
@@ -198,7 +215,7 @@ Int_t readCoincidences(const Parameters &setting,
             
             else
             {
-                std::cout << " read success !" << std:: endl;
+                std::cout << " Read success !" << std:: endl;
             }
             
 
@@ -214,6 +231,8 @@ Int_t readCoincidences(const Parameters &setting,
             {
                 Event newPulse;
                 newPulse.timeStampHeader = timestampsTemp[index];
+                newPulse.ergLong = EnergyLongTemp[index];
+                newPulse.egrShort = EnergyShortTemp[index];
                 samples = pulsesTemp[index];
 
                 // if (index < 100)
@@ -254,17 +273,29 @@ Int_t readCoincidences(const Parameters &setting,
                 {
                     newPulse.totalIntegral +=  newPulse.voltage[j];
                 }
-                newPulse.energy = setting.Calicoefs[channelIndex] * newPulse.totalIntegral;
                 
-                for (int j = ShortGate; j < LongGate && j < setting.NSamples; j++)
+                for (int j = PreGate; j < ShortGate && j < setting.NSamples; j++)
                 {
                     newPulse.tailIntegral += newPulse.voltage[j];
                 }
+                newPulse.tailIntegral = newPulse.totalIntegral - newPulse.tailIntegral;
 
+                // energy calibration
+                if (setting.CalicoefsPHD[channelIndex] != 1)
+                {
+                    newPulse.energy = setting.CalicoefsPHD[channelIndex] * newPulse.height;
+                }
+                if (setting.CalicoefsPID[channelIndex] != 1)
+                {
+                    newPulse.energy = setting.CalicoefsPID[channelIndex] * newPulse.totalIntegral;
+                }
+                
                 events.push_back(newPulse);
                 // voltagesTemp.push_back(voltageTemp);
             }
             timestampsTemp.clear();
+            EnergyShortTemp.clear();
+            EnergyLongTemp.clear();
             //std::vector<std::vector<UInt_t>>().swap(headersTemp);
             pulsesTemp.clear();
             // std::vector<std::vector<UShort_t>>().swap(pulsesTemp);
@@ -284,6 +315,10 @@ Int_t readEvents(const Parameters &setting,
     std::string filepath;
     ULong64_t timestamptemp;
     std::vector<ULong64_t> timestampsTemp;
+    UShort_t EnergyLong;
+    std::vector<UShort_t> EnergyLongTemp;
+    UShort_t EnergyShort;
+    std::vector<UShort_t> EnergyShortTemp;
     UShort_t sample;
     std::vector<UShort_t> samples(setting.NSamples);
     std::vector<std::vector<UShort_t> > pulsesTemp;
@@ -291,13 +326,20 @@ Int_t readEvents(const Parameters &setting,
     //std::vector<std::vector<Float_t>> voltagesTemp;
     std::vector<Event> eventsTemp;
     UInt_t totalheadersize = std::accumulate(setting.Headersize.begin(),setting.Headersize.end(),0); // total header size
-    UInt_t tailheadersize = std::accumulate(setting.Headersize.begin() + 3,setting.Headersize.end(),0); // size of Energy(ch) + Energy Short(ch) + Flags + Number of Samples
+    // UInt_t tailheadersize = std::accumulate(setting.Headersize.begin() + 3,setting.Headersize.end(),0); // size of Energy(ch) + Energy Short(ch) + Flags + Number of Samples
     UInt_t eventsize = totalheadersize + setting.NSamples * setting.Samplesize;
+    
+    Int_t PreTrig = setting.PreTrigger / setting.Delt;
     Int_t PreGate = setting.PreGate / setting.Delt;
+    PreGate = PreTrig - PreGate;
     if(PreGate < 0) PreGate = 0;
     Int_t LongGate = setting.LongGate  / setting.Delt;
-    if(LongGate > setting.NSamples) LongGate = setting.NSamples;
+    LongGate += PreGate;
+    // if(LongGate > setting.NSamples) LongGate = setting.NSamples;
     Int_t ShortGate = setting.ShortGate / setting.Delt;
+    ShortGate += PreGate;
+    // if(ShortGate > setting.NSamples) ShortGate = setting.NSamples;
+
     //read the data
     UInt_t channelIndex(0);
     for (auto channel : setting.Channels)
@@ -326,7 +368,7 @@ Int_t readEvents(const Parameters &setting,
                 }
                 else
                 {
-                    std::cout << " Open success !" << " Trying to read data from file: " << std::endl;
+                    std::cout << " Open success !\n" << " Reading data: " << std::endl;
                 }
 
                 //Bool_t badflag=false;
@@ -346,8 +388,13 @@ Int_t readEvents(const Parameters &setting,
                     //fileptr.ignore(setting.Headersize);
                     fileptr.ignore(setting.Headersize[0] + setting.Headersize[1]);
                     fileptr.read((char *)&(timestamptemp), setting.Headersize[2]);
+                    fileptr.read((char *)&(EnergyLong), setting.Headersize[3]);
+                    fileptr.read((char *)&(EnergyShort), setting.Headersize[4]);
+                    
                     timestampsTemp.push_back(timestamptemp);
-                    fileptr.ignore(tailheadersize);
+                    EnergyLongTemp.push_back(EnergyLong);
+                    EnergyShortTemp.push_back(EnergyShort);
+                    fileptr.ignore(setting.Headersize[5] + setting.Headersize[6]);
 
                     //read samples
                     for (int k = 0; k != setting.NSamples && !fileptr.eof(); k++)
@@ -383,7 +430,7 @@ Int_t readEvents(const Parameters &setting,
             
             else
             {
-                std::cout << " read success !" << std:: endl;
+                std::cout << " Read success !" << std:: endl;
             }
             
 
@@ -399,6 +446,8 @@ Int_t readEvents(const Parameters &setting,
             {
                 Event newPulse;
                 newPulse.timeStampHeader = timestampsTemp[index];
+                newPulse.ergLong = EnergyLongTemp[index];
+                newPulse.egrShort = EnergyShortTemp[index];
                 samples = pulsesTemp[index];
 
                 // if (index < 100)
@@ -421,7 +470,7 @@ Int_t readEvents(const Parameters &setting,
                 //convert to voltage
                 for (int k = 0; k < setting.NSamples; k++)
                 {
-                    heightTemp = (baseline - samples[k]) * convertConst; //fabs(samples[k] - baseline) * convertConst;
+                    heightTemp = setting.Polarity * (samples[k] - baseline) * convertConst; //fabs(samples[k] - baseline) * convertConst;
                     newPulse.voltage.push_back(heightTemp);
                     // newPulse.samples.push_back(samples[k]);
                     //std::cout << newPulse.voltage[k] <<std::endl;
@@ -439,16 +488,28 @@ Int_t readEvents(const Parameters &setting,
                     newPulse.totalIntegral +=  newPulse.voltage[j];
                 }
                 
-                newPulse.energy = setting.Calicoefs[channelIndex] * newPulse.totalIntegral;
-                for (int j = ShortGate; j < LongGate && j < setting.NSamples; j++)
+                // energy calibration
+                if (setting.CalicoefsPHD[channelIndex] != 1)
+                {
+                    newPulse.energy = setting.CalicoefsPHD[channelIndex] * newPulse.height;
+                }
+                if (setting.CalicoefsPID[channelIndex] != 1)
+                {
+                    newPulse.energy = setting.CalicoefsPID[channelIndex] * newPulse.totalIntegral;
+                }
+                
+                for (int j = PreGate; j < ShortGate && j < setting.NSamples; j++)
                 {
                     newPulse.tailIntegral += newPulse.voltage[j];
                 }
+                newPulse.tailIntegral = newPulse.totalIntegral - newPulse.tailIntegral;
 
                 events.push_back(newPulse);
                 // voltagesTemp.push_back(voltageTemp);
             }
             timestampsTemp.clear();
+            EnergyShortTemp.clear();
+            EnergyLongTemp.clear();
             //std::vector<std::vector<UInt_t>>().swap(headersTemp);
             pulsesTemp.clear();
             // std::vector<std::vector<UShort_t>>().swap(pulsesTemp);

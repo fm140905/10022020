@@ -12,46 +12,6 @@
 
 struct Parameters
 {
-/*
-    //Settings
-    int NHeaders;
-    int Headersize; // bytes
-    int NSamples;
-    int Samplesize; //bytes
-    float DynamicRange; // Volts
-    int Resolution;
-    int Offset; // samples to calculate the baseline
-    double Delt;
-
-    bool SavePulses;
-
-    // Bad pulses options
-    bool FilterBad;
-    bool ZeroSupression;
-    float MinVoltage; // Volts
-    bool Clipped=1;
-    float MaxVoltage; // Volts
-    bool SaveBad;
-
-    // Piled-up pulses option
-    bool FilterPiledup;
-    bool SavePiledup;
-    bool SaveSTime;
-    bool SaveSFrequency;
-
-    // Pulse height distribution and pulse integral distribution options
-    bool PHD;
-    bool SavePHD;
-    bool PID;
-    int Pre;
-    int Post;
-    bool SavePID;
-
-    // Tail integral vs total integral
-    bool TailvsTotal;
-    int TailStart;
-    int SaveTailvsTotal;
-*/
     //Settings
     std::string Directory;
     std::vector < int > Folders;
@@ -59,14 +19,15 @@ struct Parameters
     int Filetype=0; // 0 for binary, 1 for ASCII
     int NHeaders=7;
     std::vector < int > Headersize; // bytes
+    std::vector < bool > SaveHeaders; // bytes
     int NSamples=208;
     int Samplesize=2; //bytes
     float DynamicRange=2.0; // Volts
     int Resolution=14;
     int Offset=30; // number of samples to calculate the baseline
     int Delt=2; // time between 2 samples, unit: ns
-
-    bool SavePulses=0;
+    int Polarity=1; // pulse polarity
+    int SavePulses=0;
 
     bool TimeStamp=0;
     bool SaveTimeStamp=0;
@@ -79,7 +40,7 @@ struct Parameters
     float MinVoltage=0.05; // Volts
     bool Clipped=1;
     float MaxVoltage=2.0; // Volts
-    bool SaveBad=0;
+    int SaveBad=0;
 
     // Piled-up pulses option
     bool FilterPiledup=1;
@@ -88,7 +49,8 @@ struct Parameters
     bool SaveSFrequency=0;
 
     //energy cut
-    std::vector < float_t> Calicoefs;
+    std::vector < float_t> CalicoefsPID;
+    std::vector < float_t> CalicoefsPHD;
     bool EnergyCut=0;
     float_t EnergyHigh=1000;
     float_t EnergyLoW=0;
@@ -122,6 +84,7 @@ struct Parameters
     // pulse integral distribution options
     bool SavePI=0;
     bool PID=1;
+    int PreTrigger=80;
     int PreGate=4;
     int LongGate=120;
     bool SavePID=0;

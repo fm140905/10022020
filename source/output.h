@@ -7,6 +7,8 @@
 #include <functional>
 #include "TH1F.h"
 
+Int_t saveHeaders(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
+
 Int_t savePH(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
 
 Int_t savePI(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);

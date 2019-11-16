@@ -7,9 +7,11 @@
 
 struct Event
 {
-    ULong64_t timeStampHeader = 0;
-    Double_t timeStampDACFD = 0;
+    ULong64_t timeStampHeader = 0;//tt from CoMPASS, ps
+    UShort_t ergLong = 0; // long int from CoMPASS, ch
+    UShort_t egrShort = 0; // short int from CoMPASS, ch
 
+    Double_t timeStampDACFD = 0;
     std::vector<Float_t> voltage;
     // std::vector<Short_t> samples;
     Float_t height = 0;

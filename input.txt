@@ -11,25 +11,8 @@
 # File path = DIRECTORY + '/' + FOLDERS[i] + '/' + CHANNELS[j] + ".bin"
 
 	# Directory
-		#Directory: /media/ming/INL_2016/CLYC&CLLBC/CLYC&CLLBC_test_07.05.19/1DAQ/Cs_2/2DAQ/run/FILTERED
-		#Directory: /media/ming/SeagateDrive/06132019_pube/DAQ/run_preamponlyPuBe/FILTERED
-		#Directory: /media/ming/SeagateDrive/06132019/DAQ/run_preamponly/FILTERED
-		#Directory: /media/ming/SeagateDrive/032119/Co60_23/FILTERED
-		#Directory: /media/ming/SeagateDrive/active_interrogation/day1/active_run_measurement1/active_run_7/FILTERED
-		#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
-		#Directory: /media/ming/SeagateDrive/051319/DAQ/na22_quartz_3/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day1_14h_1/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day2_24h/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day3_24h_3/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day4_8h_2/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day4_16h_4/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day5_24h_1/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day6_24h_1/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day7_24h_1/FILTERED
-		#Directory: /media/ming/SeagateDrive/PALS_more_data/na22_quartz_day8_24h_2/FILTERED
-		#Directory: /media/ming/SeagateDrive/generator_test/Gamma_30kHz/FILTERED/0
-		Directory: /media/ming/SeagateDrive/generator_test/Neutron_10ns_3kHz/FILTERED
-
+	#Directory: /media/ming/SeagateDrive/generator_test/Neutron_10ns_3kHz/FILTERED
+	Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
 	# Folders: two comma-separated integers or one integer.
 		# example: 10 folders from No.0 to No.9: 0, 9
 		#	  		only 1 folder No.1: 1
@@ -51,21 +34,28 @@
 
 ################################## Input Settings ##########################################
 
-#Data Format
+#Data Format, binary
 
-NHeaders: 7 # number of headers in one pulse
-Headersize: 2, 2, 8, 2, 2, 4, 4 # size of each header in bytes
+NHeaders: 7 # number of headers in one pulse, fixed
+Headersize: 2, 2, 8, 2, 2, 4, 4 # size of each header in bytes, fixed
 	# for CoMPASS, the headers are: 
 	# Board, Channel, Time Stamps, Energy(ch), Energy Short(ch), Flags, Number of Samples
-NSamples: 200 # number of samples in one pulse
-Samplesize: 2 # size of each sample in bytes
+SaveHeaders: 1, 1, 1 # save Time stamps, Energy(ch), Energy Short(ch)
+NSamples: 104 # number of samples in one pulse
+Samplesize: 2 # size of each sample in bytes, fixed
+Polarity: -1 # polarity of the pulse: -1 for negative, +1 for positive
+
+# Digitizer-specific
 Dynamicrange: 2.0 # unit: Volt
-Resolultion: 14 #12 bits
-Offset: 8 # number of samples needed to calculate the baseline
+Resolultion: 14 #12 bits # number of bits of ADC
 Delt: 2 #2 # sampling time, unit: ns
-SavePulses: 0 # if '1', save the pulses
+Offset: 8 # number of samples needed to calculate the baseline
+SavePulses: 0 # if SavePulses = N, save the first N good pulses.
 
 ##############################################################################################
+
+
+################################### Post-Processing Starts ##################################
 
 ####################################### Coincidence ###########################################
 
@@ -77,21 +67,24 @@ Coincidence: 0
 	Coincidence Channels: 0, 1
 	Time Window: 200 #ns
 		# if DT < Time Window, we find a pair of coincident events.
-	SaveDT: 1 # whether to save the time differences
-	TOF: 1 # whether to plot the TOF spectrum
+	SaveDT: 0 # whether to save the time differences
+	TOF: 0 # whether to plot the TOF spectrum
 	# if TOF = 1
-		SaveTOF: 1 # whether to save the TOF spectrum
+		SaveTOF: 0 # whether to save the TOF spectrum
 
 ################################################################################################
 
 ####################################### Energy Calibration #####################################
 
-# specify the calibration coefficents, unit: keVee/V
+# specify the energy calibration coefficents
 # the number of coefficents should equal to the number of channels.
-# energy = total integral * calibration coefficient
 # the calibration coefficient is calculated using a Matlab script.
-Calibration: 355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
 
+# energy = total integral * CalibrationPID
+CalibrationPID: 1 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
+
+# energy = total integral * CalibrationPHD
+CalibrationPHD: 1
 ################################################################################################
 
 ####################################### Pulse Rejection ########################################
@@ -106,10 +99,10 @@ Filter bad: 1
 		# if Zerosupression = 1, reject the clipped pulses.
 		MaxVoltage: 2.0 # unit: Volt
 	Save bad: 0
-		# if Save bad = 1, save the first 100 bad pulses.
+		# if Save bad = N, save the first N bad pulses.
 
 # Piled-up pulses
-Filter piled-up: 1
+Filter piled-up: 0
 	# If filter piled-up =1
 	Save piled-up: 0
 	Save S_time: 0
@@ -132,11 +125,11 @@ PSDHigh: 1, 0.35
 
 Time stamp: 0
 	# if time stamp =1, calculate time stamps using DIACFD
-	Interpolation: 7 # number of interpolation points to add between two samples
-	TRise: 20 # rough estimate of rise time in number of samples
+	Interpolation: 0 # number of interpolation points to add between two samples
+	TRise: 20 # about 2 * pulse rise time (ns)
 	#DIACFD parameters
 		Fraction: 0.4 # range from 0 to 1.
-		Filter Width: 1
+		#Filter Width: 1
 		Time Delay: 4 #16 # unit: ns
     SaveTimeStamp: 0 # if '1', save the time stamps of good pulses
 
@@ -147,9 +140,9 @@ Time stamp: 0
 # if SavePH = 1, save the pulse heights
 SavePH: 0
 
-PHD: 0
+PHD: 1
 	# if PHD = 1, plot the pulse height distribution
-	SavePHD: 1
+	SavePHD: 0 # save the pulse height distribution
 	PHDBins: 200
 	PHmin: 0
 	PHmax: 0 #volts # if 0, automatically set the plot range of PID
@@ -157,27 +150,25 @@ PHD: 0
 # if SavePH = 1, save the pulse integrals
 SavePI: 0
 
-PID: 1
+PID: 0
 	# if PID = 1, plot the pulse integral distribution
-	# pulse total integral = sum of all samples with index between PreGate and LongGate.
-	SavePID: 0
+	SavePID: 0 # save the pulse height distribution
 	PIDBins: 200
 	PImin: 0 
-	PImax: 2000 # if 0, automatically set the plot range of PID
-	PreGate: 10 # ns
-	LongGate: 200 # ns
-PSD: 1
+	PImax: 0 # if 0, automatically set the plot range of PID
+	PreTrigger: 70 # ns # same value used in CoMPASS
+	PreGate: 10 # ns  # same value used in CoMPASS
+	LongGate: 60 # ns  # same value used in CoMPASS
+
+PSD: 0
 	# if '1', plot tail integral / total integral vs total integral
-	# pulse tail integral = sum of all samples with index between PreGate and ShortGate.
-	ShortGate: 40 #60 # ns
-	SaveIntegrals: 0
+	ShortGate: 30 # ns  # same value used in CoMPASS
+	SaveIntegrals: 0 # if '1', save the total and tail integrals
 	## plot options
 	PSDXBins: 200
 	PSDXmin: 0
-	PSDXmax: 2000
+	PSDXmax: 0
 	PSDYBins: 200
 	PSDYmin: 0 
 	PSDYmax: 1
-	
-
 ################################################################################################

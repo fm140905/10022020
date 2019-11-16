@@ -2,7 +2,7 @@
 
 Int_t getTOF(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std::vector< std::vector< Event > > &coincidentEvents)
 {
-    std::cout << "Start plotting the time difference histogram !" << std::endl;
+    // std::cout << "Start plotting the time difference histogram !" << std::endl;
 
     // if(!setting.PHD)
     // {
@@ -37,7 +37,7 @@ Int_t getTOF(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
 
 Int_t getPHD(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std::vector< Event > &events, const float_t calicoef, std::function<Bool_t(Event)> cond)
 {
-    std::cout << "Start plotting the pulse height distribution !" << std::endl;
+    // std::cout << "Start plotting the pulse height distribution !" << std::endl;
 
     // if(!setting.PHD)
     // {
@@ -46,7 +46,7 @@ Int_t getPHD(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
     // }
     if(calicoef == 1)
     {
-        histo->GetXaxis()->SetTitle("Voltage (V)");
+        histo->GetXaxis()->SetTitle("Pulse height (V)");
         //histo->GetXaxis()->SetRangeUser(0.,maxheight);
     }
     else
@@ -70,13 +70,13 @@ Int_t getPHD(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
     histo->Draw();
     canvas->Draw();
 
-    std::cout << " Pulse height distribution was plotted! " << std::endl;
+    std::cout << " Pulse height distribution is plotted! " << std::endl;
     return 0;
 }
 
 Int_t getPID(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std::vector<Event> &events, const float_t calicoef, std::function<Bool_t(Event)> cond)
 {
-    std::cout << "Start plotting the pulse integral distribution !" << std::endl;
+    // std::cout << "Start plotting the pulse integral distribution !" << std::endl;
 
     // if(!setting.PID)
     // {
@@ -86,7 +86,7 @@ Int_t getPID(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
 
     if(calicoef == 1)
     {
-        histo->GetXaxis()->SetTitle("Voltage (V)");
+        histo->GetXaxis()->SetTitle("Total integral (V*ns/dt)");
     }
     else
     {
@@ -115,13 +115,13 @@ Int_t getPID(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
     histo->Draw();
     canvas->Draw();
 
-    std::cout << " Pulse integral distribution was plotted! " << std::endl;
+    std::cout << " Pulse integral distribution is plotted! " << std::endl;
     return 0;
 }
 
 Int_t getPSD(TH2F *histo, TCanvas *canvas, const Parameters &setting, const std::vector<Event> &events, const float_t calicoef, std::function<Bool_t(Event)> cond)
 {
-    std::cout << "Start plotting the PSD !" << std::endl;
+    // std::cout << "Start plotting the PSD !" << std::endl;
 
     if(calicoef == 1)
     {
@@ -169,7 +169,7 @@ Int_t getPSD(TH2F *histo, TCanvas *canvas, const Parameters &setting, const std:
 
 Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, const std::string plotname, std::function<Bool_t(Event)> cond)
 {
-    std::cout << "Start plotting the example pulse !" << std::endl;
+    // std::cout << "Start plotting the example pulse !" << std::endl;
 
     const UInt_t N = setting.NSamples;
     Float_t x_vals[N];

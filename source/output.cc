@@ -1,5 +1,48 @@
 #include "output.h"
 
+Int_t saveHeaders(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond)
+{
+    // save timestamps from CoMPASS
+    // std::string outName2 = outName + "_timestamps";
+    std::ofstream HeaderFile(outName.c_str());
+    if (setting.SaveHeaders[0])
+    {
+        HeaderFile << "Time stamp (ps)" << '\t';
+    }
+    if (setting.SaveHeaders[1])
+    {
+        HeaderFile << "Energy (ch)" << '\t';
+    }
+    if (setting.SaveHeaders[2])
+    {
+        HeaderFile << "Energy short (ch)" << '\t';
+    }
+    HeaderFile << '\n';
+    for (int i = 0; i < events.size(); i++)
+    {
+        if (cond(events[i]))
+        {
+            if (setting.SaveHeaders[0])
+            {
+                HeaderFile << events[i].timeStampHeader << '\t';
+            }
+            if (setting.SaveHeaders[1])
+            {
+                HeaderFile << events[i].ergLong << '\t';
+            }
+            if (setting.SaveHeaders[2])
+            {
+                HeaderFile << events[i].egrShort << '\t';
+            }
+            HeaderFile << '\n';
+            
+        }
+    }
+    HeaderFile.close();
+    std::cout << "Headers are saved to file:" << outName << std::endl;
+    return 0;
+}
+
 Int_t savePH(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond)
 {
     std::ofstream PHFile(outName.c_str());
@@ -34,7 +77,7 @@ Int_t savePulses(const Parameters &setting, std::vector<Event> &events, std::str
 {
     Int_t counts(0);
     std::ofstream voltageFile(outName.c_str());
-    for (int i = 0; counts < 50 && i < events.size(); i++)
+    for (int i = 0; counts < setting.SavePulses && i < events.size(); i++)
     {
         if (cond(events[i]))
         {
@@ -160,14 +203,14 @@ Int_t savePSD(const std::vector<Event> &events, std::string outName, std::functi
 {
     std::ofstream tFile(outName.c_str());
     Int_t totalcounts(0);
-    tFile << "Total Integral (V)" << '\t' <<"PSD Ratio" << std::endl;
+    tFile << "Total integral (V)" << '\t' <<"Tail integral (V)" << std::endl;
 
     for (int i = 0; i < events.size(); i++)
     {
         if (cond(events[i]))
         {
             totalcounts ++;
-            tFile << events[i].totalIntegral << '\t' << events[i].tailIntegral / events[i].totalIntegral << std::endl;
+            tFile << events[i].totalIntegral << '\t' << events[i].tailIntegral << std::endl;
         }
     }
     tFile.close();

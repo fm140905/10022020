@@ -2,7 +2,7 @@
 
 Int_t find_coincidence(const Parameters setting, const std::vector< std::vector<ULong64_t> > &timestamps, std::vector< std::vector< UInt_t > > &pairs)
 {
-    const std::vector<Int_t> &channels = setting.CoincidenceChannels;
+    const std::vector<Int_t> channels = setting.CoincidenceChannels;
     //std::cout << "numbero of channels: " << channels.size() << std::endl;
     if (channels.size() < 2)
     {

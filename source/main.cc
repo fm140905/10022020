@@ -1,6 +1,9 @@
 #include <vector>
 #include <ctime>
 #include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* ROOT */
 #include "TApplication.h"
@@ -21,6 +24,12 @@
 
 int main(int argc, char *argv[])
 {
+    struct stat st = {0};
+    // create directories to save the output files and pics, works in Linux
+    if (stat("output", &st) == -1) {
+        mkdir("output", 0700);
+    }
+
     auto startTime = std::chrono::high_resolution_clock::now();
     const std::string settingFilePath("input.txt");
     Parameters setting;
@@ -37,7 +46,7 @@ int main(int argc, char *argv[])
     // coincidence
     if(setting.Coincidence)
     {
-        std::cout << "*****Start Picking up Coincidences between Channel";
+        std::cout << "*****Picking up Coincidences between Channel";
         for(int i=0;i<setting.CoincidenceChannels.size();i++)
         {
             std::cout << setting.CoincidenceChannels[i] << '\t';
@@ -67,7 +76,7 @@ int main(int argc, char *argv[])
         else
         {
             std::cout << coincidentIndexes.size() <<" coincidences are found! *****" << std::endl;
-            std::cout << "*****Start reading coincident pulses..*****" << std::endl;
+            std::cout << "*****Reading coincident pulses..*****" << std::endl;
 
             // read coincident pulses
             readCoincidences(setting, coincidentIndexes, coincidentEvents);
@@ -79,7 +88,7 @@ int main(int argc, char *argv[])
     else
     {
         // read data
-        std::cout << "*****Start reading pulses in Channel" << '\t';
+        std::cout << "*****Reading pulses in Channel" << '\t';
         for(int i=0;i<setting.Channels.size();i++)
         {
             std::cout << setting.Channels[i] << '\t';
@@ -87,10 +96,10 @@ int main(int argc, char *argv[])
         std::cout <<"*****"<< std::endl;
 
         readEvents(setting, coincidentEvents);
-        std::cout << "*****Finished reading pulses. ";
+        std::cout << "*****Finished reading pulses. *****" << std::endl;
     }
     
-    std::cout << "*****Start filtering bad pulses..*****" << std::endl;
+    std::cout << "*****Filtering bad pulses..*****" << std::endl;
     if (setting.FilterBad) {
         for(int i = 0;i<coincidentEvents.size();i++)
         {
@@ -113,6 +122,15 @@ int main(int argc, char *argv[])
     }
     std::cout << "*****Finished filtering bad pulses!*****" << std::endl;
     std::string outname;
+    if(std::accumulate(setting.SaveHeaders.begin(),setting.SaveHeaders.end(),0))
+    {
+        // save headers
+        for(int i = 0;i<coincidentEvents.size();i++)
+        {
+            outname = "output/Headers" + std::to_string(setting.Channels[i]);
+            saveHeaders(setting, coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
+        }
+    }
     if(setting.SavePulses)
     {
         // save 100 good pulses
@@ -136,7 +154,7 @@ int main(int argc, char *argv[])
     {
         outname = "Pulse_CH" + std::to_string(setting.Channels[i]);
         plotPulse(setting, coincidentEvents[i],outname,[](Event pulse) { return !pulse.isBad; });
-        std::cout << " Example pulse of CH" << std::to_string(i) << " was plotted! " << std::endl;
+        std::cout << " Example pulses of CH" << std::to_string(i) << " are plotted! " << std::endl;
     }
 
     if(setting.SavePH)
@@ -146,7 +164,7 @@ int main(int argc, char *argv[])
         {
             outname = "output/PH_CH" + std::to_string(setting.Channels[i]);
             savePH(setting, coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
-            std::cout << " Pulse heights were saved to file: " << outname <<" !"<< std::endl;
+            std::cout << " Pulse heights are saved to file: " << outname <<" !"<< std::endl;
         }
     }
     if(setting.SavePI)
@@ -156,7 +174,7 @@ int main(int argc, char *argv[])
         {
             outname = "output/PI_CH" + std::to_string(setting.Channels[i]);
             savePI(setting, coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
-            std::cout << " Pulse integrals were saved to file: " << outname <<" !"<< std::endl;
+            std::cout << " Pulse integrals are saved to file: " << outname <<" !"<< std::endl;
         }
     }
 
@@ -170,12 +188,12 @@ int main(int argc, char *argv[])
             outname = "CH" + std::to_string(setting.Channels[i])+"_PHD";
             TCanvas *PHcanvas = new TCanvas(outname.c_str(), "PHD Canvas", 200, 10, 700, 500);
             TH1F *PHhisto = new TH1F(outname.c_str(), outname.c_str(), setting.PHDBins, setting.PHmin, setting.PHmax);
-            getPHD(PHhisto, PHcanvas, setting, coincidentEvents[i], setting.Calicoefs[i], [](Event pulse) { return !pulse.isBad; });
+            getPHD(PHhisto, PHcanvas, setting, coincidentEvents[i], setting.CalicoefsPHD[i], [](Event pulse) { return !pulse.isBad; });
             outname = "output/" + outname +".txt";
             if (setting.SavePHD)
             {
                 saveHisto(PHhisto, outname);
-                std::cout << " Pulse height distribution was saved to file: " << outname <<" !"<< std::endl;
+                std::cout << " Pulse height distribution is saved to file: " << outname <<" !"<< std::endl;
             }
         }
     }
@@ -188,24 +206,24 @@ int main(int argc, char *argv[])
             outname = "CH" + std::to_string(setting.Channels[i]) + "_PID";
             TCanvas *PIcanvas = new TCanvas(outname.c_str(), "PID Canvas", 200, 10, 700, 500);
             TH1F *PIhisto = new TH1F(outname.c_str(), outname.c_str(), setting.PIDBins, setting.PImin, setting.PImax); //// 2000 kevee or 20.0 V
-            getPID(PIhisto, PIcanvas, setting, coincidentEvents[i], setting.Calicoefs[i],[](Event pulse) { return !pulse.isBad; });
+            getPID(PIhisto, PIcanvas, setting, coincidentEvents[i], setting.CalicoefsPID[i],[](Event pulse) { return !pulse.isBad; });
             outname = "output/" + outname +".txt";
             if (setting.SavePID)
             {
                 saveHisto(PIhisto, outname);
-                std::cout << " Pulse integral distribution was saved to file: " << outname <<" !"<< std::endl;
+                std::cout << " Pulse integral distribution is saved to file: " << outname <<" !"<< std::endl;
             }
         }
     }
 
     if (setting.TimeStamp)
     {
-        std::cout << "*****Start calculating time stamps of coincidences using DIACFD..*****" << std::endl;
+        std::cout << "*****Calculating time stamps using DIACFD..*****" << std::endl;
         for(int i = 0;i<coincidentEvents.size();i++)
         {
             getTimeStamp(setting, coincidentEvents[i]);
         }
-        std::cout << "*****Finished calculaing time stamps of coincidences!*****" << std::endl;
+        std::cout << "*****Finished calculaing time stamps!*****" << std::endl;
         
         //// TBD: multichannel support
         if (setting.Coincidence && setting.SaveDT) 
@@ -217,7 +235,7 @@ int main(int argc, char *argv[])
         if (setting.Coincidence && setting.TOF) 
         {
             TCanvas *TOFcanvas = new TCanvas("c3", "TOF Canvas", 200, 10, 700, 500);
-            TH1F *TOFhisto = new TH1F("TOF", "TOF", 400, -8.0, 12.0);
+            TH1F *TOFhisto = new TH1F("TOF", "TOF", 400, -3.0, 5.0);
             getTOF(TOFhisto, TOFcanvas, setting, coincidentEvents);
             if (setting.SaveTOF) 
             {
@@ -249,8 +267,8 @@ int main(int argc, char *argv[])
             outname = "CH" + std::to_string(setting.Channels[i]) +"_PSD";
             TCanvas *PSDcanvas = new TCanvas(outname.c_str(), "PSD Canvas", 200, 10, 700, 500);
             TH2F *PSDhisto = new TH2F(outname.c_str(), outname.c_str(), setting.PSDXBins, setting.PSDXmin, setting.PSDXmax,setting.PSDYBins, setting.PSDYmin, setting.PSDYmax); //// 2000 kevee or 20.0 V
-            getPSD(PSDhisto, PSDcanvas, setting, coincidentEvents[i], setting.Calicoefs[i],[](Event pulse) { return !pulse.isBad; });
-            std::cout << " PSD of CH" << std::to_string(i) << " was plotted! " << std::endl;
+            getPSD(PSDhisto, PSDcanvas, setting, coincidentEvents[i], setting.CalicoefsPID[i],[](Event pulse) { return !pulse.isBad; });
+            std::cout << " PSD of CH" << std::to_string(i) << " is plotted! " << std::endl;
             outname = "output/Integrals_CH" + std::to_string(setting.Channels[i]) +".txt";
             if (setting.SaveIntegrals)
             {

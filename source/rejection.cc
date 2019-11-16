@@ -88,7 +88,7 @@ Int_t rejection(const Parameters &setting, std::vector<Event> &events)
     }
 */
     // BadIndexes.clear();
-    std::cout << "Finished filtering bad pulses ! " << std::endl;
+    // std::cout << "Finished filtering bad pulses ! " << std::endl;
     return 0;
 }
 
