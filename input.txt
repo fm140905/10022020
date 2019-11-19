@@ -28,7 +28,7 @@
 	Filetype: 0
 
 	# Maximum number of pulses to process
-	MaxNumPulses: 1000000
+	MaxNumPulses: 10000
 
 ############################################################################################
 
@@ -40,8 +40,7 @@ NHeaders: 7 # number of headers in one pulse, fixed
 Headersize: 2, 2, 8, 2, 2, 4, 4 # size of each header in bytes, fixed
 	# for CoMPASS, the headers are: 
 	# Board, Channel, Time Stamps, Energy(ch), Energy Short(ch), Flags, Number of Samples
-SaveHeaders: 1, 1, 1 # save Time stamps, Energy(ch), Energy Short(ch)
-NSamples: 104 # number of samples in one pulse
+SaveHeaders: 0, 0, 0 # save Time stamps, Energy(ch), Energy Short(ch)
 Samplesize: 2 # size of each sample in bytes, fixed
 Polarity: -1 # polarity of the pulse: -1 for negative, +1 for positive
 
@@ -172,3 +171,6 @@ PSD: 0
 	PSDYmin: 0 
 	PSDYmax: 1
 ################################################################################################
+
+## No longer needed 
+## NSamples: 104 # number of samples in one pulse

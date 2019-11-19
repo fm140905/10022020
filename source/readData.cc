@@ -523,6 +523,61 @@ Int_t readEvents(const Parameters &setting,
 
     return 0;
 }
+
+Int_t getSampleNum(Parameters &setting)
+{
+    // get number of samples from the header
+    // for CoMPASS only
+    std::string filepath;
+
+    //read the data
+    UInt_t channelIndex(0);
+    Int_t sampleNum(0);
+    UInt_t channel = setting.Channels[0];
+    for (int j = setting.Folders[0]; j <= setting.Folders[1]; j++)
+    {
+        filepath = setting.Directory + '/' + std::to_string(j) + '/' + "channel" + std::to_string(channel) + ".bin";
+        // std::cout << filepaths[i-setting.NFolders[0]] << std::endl;
+        // std::cout << filepaths[i-setting.NFolders[0]].length() << std::endl;
+
+        //binary
+        if (setting.Filetype == 0)
+        {
+            std::ifstream fileptr;
+            fileptr.open(filepath, std::ios::in | std::ios::binary);
+            // std::cout << "Trying to open binary file: " << filepath << std::endl;
+            if (!fileptr.is_open())
+            {
+                std::cout << "Cannot open file: " << filepath << std::endl;
+                exit(1);
+            }
+            else
+            {
+                std::cout << " Number of samples in each pulse:";
+            }
+
+            //Bool_t badflag=false;
+
+            //UInt_t offset = pairs[currentNumber][channel];
+            // std::ofstream samplefile("rawsamples"+std::to_string(channel));
+            while (!fileptr.eof())
+            {
+                //read header
+                fileptr.ignore(std::accumulate(setting.Headersize.begin(),setting.Headersize.end()-1, 0));
+
+                fileptr.read((char *)&(sampleNum), setting.Headersize[6]);
+                // fileptr.ignore(setting.Headersize[5] + setting.Headersize[6]);
+
+                break;
+            }
+            fileptr.close();
+            // samplefile.close();
+        }
+    }
+    setting.NSamples = sampleNum;
+    std::cout << sampleNum << std::endl;
+
+}
 // Int_t newPulseHeight(const Parameters &setting,
 //                 std::vector< std::vector< Event > > &coincidentEvents)
 // {

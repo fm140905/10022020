@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
     // step 0 read input parameters
     getInputParameters(settingFilePath, setting);
+    getSampleNum(setting);
     // return 0;
 
     //// step 1, read the data in binary/ASCII format, calculate the baseline, convert to voltage, calculate heightIndex.
