@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         for(int i = 0;i<coincidentEvents.size();i++)
         {
             outname = "output/goodpulsesch" + std::to_string(setting.Channels[i]);
-            savePulses(setting, coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
+            savePulses(setting, coincidentEvents[i], setting.SavePulses, outname, [](Event pulse) { return !pulse.isBad; });
         }
     }
     if(setting.SaveBad)
@@ -155,8 +155,17 @@ int main(int argc, char *argv[])
         // save N bad pulses
         for(int i = 0;i<coincidentEvents.size();i++)
         {
-            outname = "output/baddpulsesch" + std::to_string(setting.Channels[i]);
-            savePulses(setting, coincidentEvents[i], outname, [](Event pulse) { return pulse.isBad; });
+            outname = "output/badpulsesch" + std::to_string(setting.Channels[i]);
+            savePulses(setting, coincidentEvents[i], setting.SaveBad, outname, [](Event pulse) { return pulse.isBad; });
+        }
+    }
+    if(setting.SavePiledup)
+    {
+        // save N pile-up pulses
+        for(int i = 0;i<coincidentEvents.size();i++)
+        {
+            outname = "output/pileuppulsesch" + std::to_string(setting.Channels[i]);
+            savePulses(setting, coincidentEvents[i], setting.SavePiledup, outname, [](Event pulse) { return pulse.isPiled; });
         }
     }
     

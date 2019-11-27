@@ -73,11 +73,11 @@ Int_t savePI(const Parameters &setting, std::vector<Event> &events, std::string 
     return 0;
 }
 
-Int_t savePulses(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond)
+Int_t savePulses(const Parameters &setting, std::vector<Event> &events, const Int_t maxNum, std::string outName, std::function<Bool_t(Event)> cond)
 {
     Int_t counts(0);
     std::ofstream voltageFile(outName.c_str());
-    for (int i = 0; counts < setting.SavePulses && i < events.size(); i++)
+    for (int i = 0; counts < maxNum && i < events.size(); i++)
     {
         if (cond(events[i]))
         {

@@ -25,10 +25,9 @@
     - Use `SavePulses` to save good pulses.
     - Use `Save bad` to save bad pulses.
 - Plot pulses.
-    - 10 pulses will be plotted for debugging purposes.
+    - 10 pulses, the long gate and short gate will be plotted for debugging purposes.
     <!-- - ![Example pulses](https://uofi.box.com/shared/static/1oxvh3skhzwmnccj3wgvu9nhvrt1d8ra.png) -->
     - <img src="https://uofi.box.com/shared/static/1oxvh3skhzwmnccj3wgvu9nhvrt1d8ra.png"  width="400">
-
 
 ## Pulse integral distribution (PID) plot
 - In `input.txt`, make sure `PID` is 1 if you want to plot the PID in the program.
@@ -56,6 +55,12 @@
     - `Interpolation` set the number of interpolation points to add between two adjacent samples.
     - `Time Delay` and `Fraction` are the CFD parameters.
 
+## Pile-up rejection
+- Set `Filter piled-up` to `1` to enable piled-up rejection.
+    - `PUwindow` is approximately the width of the rising edge in unit of ns.
+    - `PUfraction` is typically between 0 and 0.2. Samller fraction, more pulses will be rejected.
+    - `PUthreshold` is the noise level.
+    - Use `Save piled-up` to save the piled-up pulses.
 ## Run
 - Sometimes the file is too lagre to be processed at one time (a few GB). In this case, you can split the file into several parts and process them seperately. Or you can use a small `MaxNumPulses`.
 - Open a terminal, type `bin/main` to run.

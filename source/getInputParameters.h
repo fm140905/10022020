@@ -44,7 +44,7 @@ struct Parameters
 
     // Piled-up pulses option
     bool FilterPiledup=1;
-    bool SavePiledup=0;
+    int SavePiledup=0;
     float PUfraction;
     float  PUthreshold;
     int PUwindow;

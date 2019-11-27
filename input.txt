@@ -104,7 +104,7 @@ Filter bad: 1
 # Piled-up pulses
 Filter piled-up: 1
 	# If filter piled-up =1
-	Save piled-up: 0
+	Save piled-up: 0 # if Save bad = N, save the first N bad pulses.
 	PUwindow: 8 # approximately the width of rising edge, in unit of ns
 	PUfraction: 0.1
 	PUthreshold: 0.01 # unit: Volts
