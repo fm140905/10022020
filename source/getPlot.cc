@@ -173,6 +173,7 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
 
     const UInt_t N = setting.NSamples;
     Float_t x_vals[N];
+    Float_t gateHeight(0);
     for (int i = 0; i < N; i++)
     {
         x_vals[i] = setting.Delt * i;
@@ -201,9 +202,10 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
     const UInt_t M = (10 < good_counts ? 10 : good_counts);
 
     std::vector<std::vector<Float_t> > y_vals(M);
-    TGraph *graphs[M];
+    TGraph *graphs[M+2];
     good_counts = 0;
     for(int i=0; i < events.size() && good_counts < M;i++)
+    {
         if(cond(events[i]))
         {
             for (int j = 0; j < N; j++)
@@ -211,12 +213,56 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
                 y_vals[good_counts].push_back( events[i].voltage[j] );
             }
             graphs[good_counts] = new TGraph(N, x_vals, &(y_vals[good_counts][0] ));
+            // graphs[good_counts]->SetMarkerStyle(20);
             // graphs[i]->SetLineColor(kRed + i* 2);
+            if (events[i].height > gateHeight)
+            {
+                gateHeight = events[i].height;
+            }
             good_counts ++;
             // break;
         }
-    {
     }
+    Int_t PreTrig = setting.PreTrigger / setting.Delt;
+    Int_t PreGate = setting.PreGate / setting.Delt;
+    PreGate = PreTrig - PreGate;
+    if(PreGate < 0) PreGate = 0;
+    Int_t LongGate = setting.LongGate  / setting.Delt;
+    LongGate += PreGate;
+    // if(LongGate > setting.NSamples) LongGate = setting.NSamples;
+    Int_t ShortGate = setting.ShortGate / setting.Delt;
+    ShortGate += PreGate;
+    
+    // Long gate
+    Float_t longgate_vals[N];
+    for (int i = 0; i < N; i++)
+    {
+        if(i < PreGate || i >= LongGate)
+        {
+            longgate_vals[i] = 0.7;//0.8 * gateHeight;
+        }
+        else
+        {
+            longgate_vals[i] =  0.9 * gateHeight;
+        }
+    }
+    graphs[M] = new TGraph(N, x_vals, &(longgate_vals[0] ));
+    // graphs[M]->SetLineColor(kRed);
+    // Short Gate
+    Float_t shortgate_vals[N];
+    for (int i = 0; i < N; i++)
+    {
+        if(i < PreGate || i >= ShortGate)
+        {
+            shortgate_vals[i] = 0.4;//0.4 * gateHeight;
+        }
+        else
+        {
+            shortgate_vals[i] = 0.5 * gateHeight;
+        }
+    }
+    graphs[M+1] = new TGraph(N, x_vals, &(shortgate_vals[0] ));
+    // graphs[M+1]->SetLineColor(kGreen);
 
     // srand(time(NULL)); // Seeding the random number generator
     // std::string canvasname;
@@ -236,14 +282,14 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
     // graphs[1]->SetMarkerColor(kRed + 2);
     // graphs[1]->Draw("SAME");
     TMultiGraph *mg = new TMultiGraph();
-    for (int i = 0; i < y_vals.size(); i++)
+    for (int i = 0; i < y_vals.size() + 2; i++)
     {
         mg->Add(graphs[i],"lp");
     }
     mg->SetTitle(plotname.c_str());
     mg->GetXaxis()->SetTitle("Time (ns)");
     mg->GetYaxis()->SetTitle("Voltage (V)");
-    mg->Draw("a PLC PMC");
+    mg->Draw("A PLC PMC");
 
     canvas->Draw();
 

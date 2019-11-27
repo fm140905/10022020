@@ -22,8 +22,8 @@ struct Event
     Float_t tailIntegral = 0;
     //Float_t tailRatio=0;
     Bool_t isBad = false;
-    //Bool_t isPiled = false;
-    //Bool_t isNeutron = false;
+    Bool_t isPiled = false;
+    Bool_t isGamma = false;
     //UShort_t pulseType=0;
 };
 

@@ -12,7 +12,8 @@
 
 	# Directory
 	#Directory: /media/ming/SeagateDrive/generator_test/Neutron_10ns_3kHz/FILTERED
-	Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
+	#Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
+	Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
 	# Folders: two comma-separated integers or one integer.
 		# example: 10 folders from No.0 to No.9: 0, 9
 		#	  		only 1 folder No.1: 1
@@ -20,7 +21,7 @@
 
 	# Channels: specify the channels to process
 		# example: Channel 0 and Channel 4: 0, 4
-	Channels: 0
+	Channels: 4
 
 	# Filetype
 		# example: binary, FILETYPE = 0;
@@ -28,7 +29,7 @@
 	Filetype: 0
 
 	# Maximum number of pulses to process
-	MaxNumPulses: 10000
+	MaxNumPulses: 100000
 
 ############################################################################################
 
@@ -80,7 +81,7 @@ Coincidence: 0
 # the calibration coefficient is calculated using a Matlab script.
 
 # energy = total integral * CalibrationPID
-CalibrationPID: 1 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
+CalibrationPID: 166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
 
 # energy = total integral * CalibrationPHD
 CalibrationPHD: 1
@@ -101,16 +102,19 @@ Filter bad: 1
 		# if Save bad = N, save the first N bad pulses.
 
 # Piled-up pulses
-Filter piled-up: 0
+Filter piled-up: 1
 	# If filter piled-up =1
 	Save piled-up: 0
-	Save S_time: 0
-    Save S_frequency: 0
+	PUwindow: 8 # approximately the width of rising edge, in unit of ns
+	PUfraction: 0.1
+	PUthreshold: 0.01 # unit: Volts
+	# Save S_time: 0
+    # Save S_frequency: 0
 
 # Energy cut
 # if EnergyCut = 1, only process the pulses whose energy is between EnergyLow and EnergyHigh
 EnergyCut: 0
-EnergyLow: 200 # unit: keVee
+EnergyLow: 50 # unit: keVee
 EnergyHigh: 2000 # unit: keVee
 
 #PSD cut
@@ -139,7 +143,7 @@ Time stamp: 0
 # if SavePH = 1, save the pulse heights
 SavePH: 0
 
-PHD: 1
+PHD: 0
 	# if PHD = 1, plot the pulse height distribution
 	SavePHD: 0 # save the pulse height distribution
 	PHDBins: 200
@@ -154,19 +158,19 @@ PID: 0
 	SavePID: 0 # save the pulse height distribution
 	PIDBins: 200
 	PImin: 0 
-	PImax: 0 # if 0, automatically set the plot range of PID
-	PreTrigger: 70 # ns # same value used in CoMPASS
-	PreGate: 10 # ns  # same value used in CoMPASS
-	LongGate: 60 # ns  # same value used in CoMPASS
+	PImax: 2000 # if 0, automatically set the plot range of PID
+	PreTrigger: 40 # ns # same value used in CoMPASS
+	PreGate: 20 # ns  # same value used in CoMPASS
+	LongGate: 240 # ns  # same value used in CoMPASS
 
 PSD: 0
 	# if '1', plot tail integral / total integral vs total integral
-	ShortGate: 30 # ns  # same value used in CoMPASS
+	ShortGate: 40 # ns  # same value used in CoMPASS
 	SaveIntegrals: 0 # if '1', save the total and tail integrals
 	## plot options
 	PSDXBins: 200
 	PSDXmin: 0
-	PSDXmax: 0
+	PSDXmax: 2000
 	PSDYBins: 200
 	PSDYmin: 0 
 	PSDYmax: 1

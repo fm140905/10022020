@@ -45,6 +45,9 @@ struct Parameters
     // Piled-up pulses option
     bool FilterPiledup=1;
     bool SavePiledup=0;
+    float PUfraction;
+    float  PUthreshold;
+    int PUwindow;
     bool SaveSTime=0;
     bool SaveSFrequency=0;
 

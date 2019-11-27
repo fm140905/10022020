@@ -58,7 +58,8 @@ int getInputParameters(std::string filepath, Parameters &setting)
                          "PSDHigh: ","SavePH: ","SavePI: ","PIDBins: ","PImin: ","PImax: ",
                          "PHDBins: ","PHmin: ","PHmax: ", "TRise: ","PSDXBins: ",
                          "PSDXmin: ","PSDXmax: ","PSDYBins: ","PSDYmin: ","PSDYmax: ",
-                         "SaveHeaders: ", "Polarity: ","PreTrigger: ", "CalibrationPHD: "};
+                         "SaveHeaders: ", "Polarity: ","PreTrigger: ", "CalibrationPHD: ",
+                         "PUwindow: ","PUfraction: ","PUthreshold: "};
     while (getline(fileptr, line))
     {
         lines.push_back(line);
@@ -663,6 +664,27 @@ int getInputParameters(std::string filepath, Parameters &setting)
                 getline(ss, substr, ',');
                 setting.CalicoefsPHD.push_back(stof(substr));
             }
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 72th
+        else if (line.find(tag[71]) == 0)
+        {
+            taglength = tag[71].length();
+            setting.PUwindow= stoi(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 73th
+        else if (line.find(tag[72]) == 0)
+        {
+            taglength = tag[72].length();
+            setting.PUfraction= stof(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 74th
+        else if (line.find(tag[73]) == 0)
+        {
+            taglength = tag[73].length();
+            setting.PUthreshold= stof(line.substr(taglength, std::string::npos));
             //std::cout << line.substr(taglength,std::string::npos) << std::endl;
         }
         // add more options here.

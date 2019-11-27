@@ -8,3 +8,8 @@
 - Remove `NSamples`. Read the number of samples from the header directly.
 ### Bug fix
 - Change the definitions of `ShortGate`, `LongGate`. New definitions are the same as the ones defined in CoMPASS.
+
+## Nov. 27, 2019
+### New
+- Add `PUwindow`, `PUfraction`, `PUthreshold` for simple pile-up rejection. 
+- Plot LongGate and ShortGate together with the example pulses.

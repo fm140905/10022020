@@ -116,10 +116,70 @@ Int_t PSDCut(const Parameters &setting, const UInt_t index, std::vector< Event >
         {
             psdtemp = events[i].tailIntegral / events[i].totalIntegral;
             if (psdtemp < setting.PSDLow[index] || psdtemp > setting.PSDHigh[index]) {
+                events[i].isGamma = true;
                 events[i].isBad = true;
             }
             
         }
     }
+    return 0;
+}
+
+Int_t simplePUR(const Parameters &setting, const UInt_t index, std::vector< Event >& events )
+{
+    if (!setting.FilterPiledup)
+    {
+        std::cout << "You choose not to filter pile-up pulses !" << std::endl;
+        return 0;
+    }
+
+    Int_t badnumber(0);
+    Int_t indexTemp(0);
+    Float_t heightTemp(0);
+    const int dpjump = setting.PUwindow / setting.Delt; // data point jump, ~ rising edge
+    const float dpf = setting.PUfraction; // double pulse fraction
+    const float threshV = setting.PUthreshold; // the noise level
+    float deltaV = 0;
+    for (int i = 0; i < events.size(); i++)
+    {
+        if (events[i].isBad)
+        {
+            continue;
+        }
+        indexTemp = events[i].heightindex;
+        heightTemp = events[i].height;
+        
+        for (int j = indexTemp; j < events[i].voltage.size() - dpjump; j++)
+        {
+            // detect the rising edge of the second pulse that occurs after the triggering pulse
+            deltaV = events[i].voltage[j+dpjump] - events[i].voltage[j];
+            // threshV = 
+            if (deltaV > dpf * heightTemp && deltaV > threshV) // && deltaV > setting.MinVoltage[0])
+            {
+                events[i].isPiled = true;
+                events[i].isBad = true;
+                badnumber ++;
+                break;
+            }
+        }
+        if (events[i].isBad)
+        {
+            continue;
+        }
+        for (int j = 0; j < indexTemp - 2 * dpjump; j++)
+        {
+            // detect the rising edge of the second pulse that occurs before the triggering pulse
+            deltaV = events[i].voltage[j+dpjump] - events[i].voltage[j];
+            // threshV = 
+            if (deltaV > dpf * heightTemp && deltaV > threshV) // && deltaV > setting.MinVoltage[0])
+            {
+                events[i].isPiled = true;
+                events[i].isBad = true;
+                badnumber ++;
+                break;
+            }
+        }
+    }
+    std::cout << " " << badnumber << " pile-up pulses are found!" << std::endl;
     return 0;
 }

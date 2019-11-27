@@ -107,6 +107,15 @@ int main(int argc, char *argv[])
             rejection(setting, coincidentEvents[i]);
         }
     }
+    for(int i = 0;i<coincidentEvents.size();i++)
+    {
+        if (setting.FilterPiledup) {
+            std::cout << "*****Filtering pile-up pulses.." 
+                << std::to_string(setting.Channels[i]) << "*****" << std::endl;
+            simplePUR(setting, i, coincidentEvents[i]);
+            std::cout << "*****Finished filtering pile-up pulses!*****" << std::endl;
+        }
+    }
     if(setting.EnergyCut)
     {
         for(int i = 0;i<coincidentEvents.size();i++)
@@ -134,7 +143,7 @@ int main(int argc, char *argv[])
     }
     if(setting.SavePulses)
     {
-        // save 100 good pulses
+        // save N good pulses
         for(int i = 0;i<coincidentEvents.size();i++)
         {
             outname = "output/goodpulsesch" + std::to_string(setting.Channels[i]);
@@ -143,7 +152,7 @@ int main(int argc, char *argv[])
     }
     if(setting.SaveBad)
     {
-        // save 100 bad pulses
+        // save N bad pulses
         for(int i = 0;i<coincidentEvents.size();i++)
         {
             outname = "output/baddpulsesch" + std::to_string(setting.Channels[i]);
