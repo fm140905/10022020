@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
             rejection(setting, coincidentEvents[i]);
         }
     }
+    std::cout << "*****Finished filtering bad pulses!*****" << std::endl;
     for(int i = 0;i<coincidentEvents.size();i++)
     {
         if (setting.FilterPiledup) {
@@ -130,7 +131,6 @@ int main(int argc, char *argv[])
             PSDCut(setting, i, coincidentEvents[i]);
         }
     }
-    std::cout << "*****Finished filtering bad pulses!*****" << std::endl;
     std::string outname;
     if(std::accumulate(setting.SaveHeaders.begin(),setting.SaveHeaders.end(),0))
     {
@@ -171,6 +171,7 @@ int main(int argc, char *argv[])
     
     for(int i = 0;i<coincidentEvents.size();i++)
     {
+        // plot 10 good pulses
         outname = "Pulse_CH" + std::to_string(setting.Channels[i]);
         plotPulse(setting, coincidentEvents[i],outname,[](Event pulse) { return !pulse.isBad; });
         std::cout << " Example pulses of CH" << std::to_string(i) << " are plotted! " << std::endl;

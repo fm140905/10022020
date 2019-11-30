@@ -44,13 +44,31 @@ Int_t rejection(const Parameters &setting, std::vector<Event> &events)
         {
             for (int j = 0; j < setting.Offset; j++)
             {
-                if (events[i].voltage[j] > 0.1 /*setting.MinVoltage*/)
+                if (events[i].voltage[j] > heightTemp * 0.05 /*setting.MinVoltage*/)
                 {
                     events[i].isBad = true;
                     break;
                 }
             }
         }
+        if (!events[i].isBad)
+        {
+            for (int j = indexTemp+1; j < setting.NSamples; j++)
+            {
+                if (events[i].voltage[j] < -0.05 * heightTemp /*setting.MinVoltage*/)
+                {
+                    events[i].isBad = true;
+                    break;
+                }
+            }
+        }
+        // if (!events[i].isBad)
+        // {
+        //     if (events[i].totalIntegral < 0 || events[i].tailIntegral < 0)
+        //     {
+        //         events[i].isBad = true;
+        //     }
+        // }
 
         // if (!events[i].isBad)
         // {

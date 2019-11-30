@@ -239,7 +239,7 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
     {
         if(i < PreGate || i >= LongGate)
         {
-            longgate_vals[i] = 0.7;//0.8 * gateHeight;
+            longgate_vals[i] = 0.7 * gateHeight;
         }
         else
         {
@@ -254,7 +254,7 @@ Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, con
     {
         if(i < PreGate || i >= ShortGate)
         {
-            shortgate_vals[i] = 0.4;//0.4 * gateHeight;
+            shortgate_vals[i] = 0.4 * gateHeight;
         }
         else
         {

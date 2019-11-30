@@ -13,7 +13,8 @@
 	# Directory
 	#Directory: /media/ming/SeagateDrive/generator_test/Neutron_10ns_3kHz/FILTERED
 	#Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
-	Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
+	#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
+	Directory: /media/ming/SeagateDrive/clyc_detector/PuBe_source_data
 	# Folders: two comma-separated integers or one integer.
 		# example: 10 folders from No.0 to No.9: 0, 9
 		#	  		only 1 folder No.1: 1
@@ -21,7 +22,7 @@
 
 	# Channels: specify the channels to process
 		# example: Channel 0 and Channel 4: 0, 4
-	Channels: 4
+	Channels: 0
 
 	# Filetype
 		# example: binary, FILETYPE = 0;
@@ -29,7 +30,7 @@
 	Filetype: 0
 
 	# Maximum number of pulses to process
-	MaxNumPulses: 100000
+	MaxNumPulses: 10000
 
 ############################################################################################
 
@@ -43,12 +44,12 @@ Headersize: 2, 2, 8, 2, 2, 4, 4 # size of each header in bytes, fixed
 	# Board, Channel, Time Stamps, Energy(ch), Energy Short(ch), Flags, Number of Samples
 SaveHeaders: 0, 0, 0 # save Time stamps, Energy(ch), Energy Short(ch)
 Samplesize: 2 # size of each sample in bytes, fixed
-Polarity: -1 # polarity of the pulse: -1 for negative, +1 for positive
+Polarity: 1 # polarity of the pulse: -1 for negative, +1 for positive
 
 # Digitizer-specific
 Dynamicrange: 2.0 # unit: Volt
 Resolultion: 14 #12 bits # number of bits of ADC
-Delt: 2 #2 # sampling time, unit: ns
+Delt: 4 #2 # sampling time, unit: ns
 Offset: 8 # number of samples needed to calculate the baseline
 SavePulses: 0 # if SavePulses = N, save the first N good pulses.
 
@@ -81,9 +82,9 @@ Coincidence: 0
 # the calibration coefficient is calculated using a Matlab script.
 
 # energy = total integral * CalibrationPID
-CalibrationPID: 166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
+CalibrationPID: 1 #166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
 
-# energy = total integral * CalibrationPHD
+# energy = pulse height * CalibrationPHD
 CalibrationPHD: 1
 ################################################################################################
 
@@ -95,7 +96,7 @@ Filter bad: 1
 	Zerosupression: 1
 		# if Zerosupression = 1, reject the pulses whose amplitudes < MinVoltage
 		MinVoltage: 0.0 #0.8 # unit: Volt
-	Clipped: 1
+	Clipped: 0
 		# if Zerosupression = 1, reject the clipped pulses.
 		MaxVoltage: 2.0 # unit: Volt
 	Save bad: 0
@@ -105,9 +106,9 @@ Filter bad: 1
 Filter piled-up: 1
 	# If filter piled-up =1
 	Save piled-up: 0 # if Save bad = N, save the first N bad pulses.
-	PUwindow: 8 # approximately the width of rising edge, in unit of ns
-	PUfraction: 0.1
-	PUthreshold: 0.01 # unit: Volts
+	PUwindow: 10000 #8 # approximately the width of rising edge, in unit of ns
+	PUfraction: 0.05
+	PUthreshold: 0.001 # unit: Volts
 	# Save S_time: 0
     # Save S_frequency: 0
 
@@ -143,7 +144,7 @@ Time stamp: 0
 # if SavePH = 1, save the pulse heights
 SavePH: 0
 
-PHD: 0
+PHD: 1
 	# if PHD = 1, plot the pulse height distribution
 	SavePHD: 0 # save the pulse height distribution
 	PHDBins: 200
@@ -153,28 +154,28 @@ PHD: 0
 # if SavePH = 1, save the pulse integrals
 SavePI: 0
 
-PID: 0
+PID: 1
 	# if PID = 1, plot the pulse integral distribution
 	SavePID: 0 # save the pulse height distribution
 	PIDBins: 200
 	PImin: 0 
-	PImax: 2000 # if 0, automatically set the plot range of PID
-	PreTrigger: 40 # ns # same value used in CoMPASS
-	PreGate: 20 # ns  # same value used in CoMPASS
-	LongGate: 240 # ns  # same value used in CoMPASS
+	PImax: 5000 # if 0, automatically set the plot range of PID
+	PreTrigger: 2000 #40 # ns # same value used in CoMPASS
+	PreGate: 1000 # ns  # same value used in CoMPASS
+	LongGate: 100000 # ns  # same value used in CoMPASS
 
-PSD: 0
+PSD: 1
 	# if '1', plot tail integral / total integral vs total integral
-	ShortGate: 40 # ns  # same value used in CoMPASS
+	ShortGate: 20000 # ns  # same value used in CoMPASS
 	SaveIntegrals: 0 # if '1', save the total and tail integrals
 	## plot options
 	PSDXBins: 200
 	PSDXmin: 0
-	PSDXmax: 2000
+	PSDXmax: 5000
 	PSDYBins: 200
 	PSDYmin: 0 
 	PSDYmax: 1
 ################################################################################################
 
-## No longer needed 
+## No longer used 
 ## NSamples: 104 # number of samples in one pulse
