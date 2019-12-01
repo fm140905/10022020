@@ -15,3 +15,7 @@
 ### New
 - Add `PUwindow`, `PUfraction`, `PUthreshold` for simple pile-up rejection. 
 - Plot LongGate and ShortGate together with the example pulses.
+
+## Dec. 1, 2019
+### New
+- Add `SavePSD` to save PSD as a 2d histogram in a text file.

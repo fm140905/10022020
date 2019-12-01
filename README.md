@@ -48,6 +48,7 @@
     <!-- - ![PSD](https://uofi.box.com/shared/static/dlapqd8dpmrcopiyq5bw9ghwmafm64n9.png) -->
     - <img src="https://uofi.box.com/shared/static/dlapqd8dpmrcopiyq5bw9ghwmafm64n9.png"  width="400">
 - Use `SaveIntegrals` to save the tail and total integrals.
+- Use `SavePSD` to save PSD as a 2d hitogram in txt.
 
 ## Constant-fraction discrimination (CFD)
 - Set `Time stamp` to `1` to enable CFD [2].
