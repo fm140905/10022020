@@ -59,7 +59,7 @@ int getInputParameters(std::string filepath, Parameters &setting)
                          "PHDBins: ","PHmin: ","PHmax: ", "TRise: ","PSDXBins: ",
                          "PSDXmin: ","PSDXmax: ","PSDYBins: ","PSDYmin: ","PSDYmax: ",
                          "SaveHeaders: ", "Polarity: ","PreTrigger: ", "CalibrationPHD: ",
-                         "PUwindow: ","PUfraction: ","PUthreshold: "};
+                         "PUwindow: ","PUfraction: ","PUthreshold: ", "SavePSD: "};
     while (getline(fileptr, line))
     {
         lines.push_back(line);
@@ -685,6 +685,13 @@ int getInputParameters(std::string filepath, Parameters &setting)
         {
             taglength = tag[73].length();
             setting.PUthreshold= stof(line.substr(taglength, std::string::npos));
+            //std::cout << line.substr(taglength,std::string::npos) << std::endl;
+        }
+        // 75th
+        else if (line.find(tag[74]) == 0)
+        {
+            taglength = tag[74].length();
+            setting.SavePSD= stoi(line.substr(taglength, std::string::npos));
             //std::cout << line.substr(taglength,std::string::npos) << std::endl;
         }
         // add more options here.

@@ -168,11 +168,12 @@ PSD: 1
 	# if '1', plot tail integral / total integral vs total integral
 	ShortGate: 20000 # ns  # same value used in CoMPASS
 	SaveIntegrals: 0 # if '1', save the total and tail integrals
+	SavePSD: 1 # if'1', save PSD as a 2d histogram in txt.
 	## plot options
-	PSDXBins: 200
+	PSDXBins: 100
 	PSDXmin: 0
 	PSDXmax: 5000
-	PSDYBins: 200
+	PSDYBins: 100
 	PSDYmin: 0 
 	PSDYmax: 1
 ################################################################################################

@@ -292,8 +292,14 @@ int main(int argc, char *argv[])
             outname = "output/Integrals_CH" + std::to_string(setting.Channels[i]) +".txt";
             if (setting.SaveIntegrals)
             {
-                savePSD(coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
-                std::cout << " PSD ratios of CH" << std::to_string(i) << " are saved to file " << outname << "!" << std::endl;
+                saveIntegrals(coincidentEvents[i], outname, [](Event pulse) { return !pulse.isBad; });
+                std::cout << " Tail and total integrals of CH" << std::to_string(i) << " are saved to file " << outname << "!" << std::endl;
+            }
+            if (setting.SavePSD)
+            {
+                outname = "output/PSD_CH" + std::to_string(setting.Channels[i]) +".txt";
+                saveHisto2D(PSDhisto, outname);
+                std::cout << " PSD of CH" << std::to_string(i) << " are saved to file " << outname << "!" << std::endl;
             }
         }
     }

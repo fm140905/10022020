@@ -199,7 +199,29 @@ Int_t saveHisto(TH1F *histo, std::string outName)
     return 0;
 }
 
-Int_t savePSD(const std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond)
+Int_t saveHisto2D(TH2F *histo, std::string outName)
+{
+    std::ofstream outFile(outName.c_str());
+    outFile << "X" << '\t' <<"Y"<<'\t' <<"Counts" << '\n';
+    for (int i = 1; i <= histo->GetNbinsX(); i++)
+    {
+        for (int j = 1; j <= histo->GetNbinsY(); j++)
+        {
+            outFile << ((TAxis*)histo->GetXaxis())->GetBinCenter(i) << '\t' 
+                    << ((TAxis*)histo->GetYaxis())->GetBinCenter(j)<<'\t' 
+                    <<histo->GetBinContent(i,j) << '\n';
+            // fprintf(out_file, "%g\t%g\t%g\n",
+            //         ((TAxis*)histo->GetXaxis())->GetBinCenter(i), ((TAxis*)histo->GetYaxis())->GetBinCenter(j), histo->GetBinContent(i,j));
+            /* code */
+        }
+        
+    }
+    outFile.close();
+
+    return 0;
+}
+
+Int_t saveIntegrals(const std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond)
 {
     std::ofstream tFile(outName.c_str());
     Int_t totalcounts(0);

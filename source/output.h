@@ -6,6 +6,7 @@
 #include <fstream>
 #include <functional>
 #include "TH1F.h"
+#include "TH2F.h"
 
 Int_t saveHeaders(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
 
@@ -23,7 +24,9 @@ Int_t saveTOF(TH1F *histo, std::string outName); // save TOF histogram
 
 Int_t saveHisto(TH1F *histo, std::string outName);
 
-Int_t savePSD(const std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
+Int_t saveHisto2D(TH2F *histo, std::string outName);
+
+Int_t saveIntegrals(const std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
 
 template <typename Iterator>
     void stringstream_approach(Iterator begin, Iterator end, const std::string &fileName) {

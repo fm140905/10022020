@@ -106,6 +106,7 @@ struct Parameters
     int PSDYBins=200;
     float PSDYmin=0;
     float PSDYmax=1;
+    bool SavePSD=0;
     //  Maximum number of pulses to process
     int MaxNumPulses=1;
 };
