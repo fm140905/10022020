@@ -15,6 +15,8 @@
 	#Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
 	#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
 	Directory: /media/ming/SeagateDrive/clyc_detector/PuBe_source_data
+	#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
+	#Directory: /home/ming/Downloads
 	# Folders: two comma-separated integers or one integer.
 		# example: 10 folders from No.0 to No.9: 0, 9
 		#	  		only 1 folder No.1: 1
@@ -82,7 +84,7 @@ Coincidence: 0
 # the calibration coefficient is calculated using a Matlab script.
 
 # energy = total integral * CalibrationPID
-CalibrationPID: 1 #166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
+CalibrationPID: 1 #175.6707 #166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
 
 # energy = pulse height * CalibrationPHD
 CalibrationPHD: 1
@@ -96,7 +98,7 @@ Filter bad: 1
 	Zerosupression: 1
 		# if Zerosupression = 1, reject the pulses whose amplitudes < MinVoltage
 		MinVoltage: 0.0 #0.8 # unit: Volt
-	Clipped: 0
+	Clipped: 1
 		# if Zerosupression = 1, reject the clipped pulses.
 		MaxVoltage: 2.0 # unit: Volt
 	Save bad: 0
@@ -107,7 +109,7 @@ Filter piled-up: 1
 	# If filter piled-up =1
 	Save piled-up: 0 # if Save bad = N, save the first N bad pulses.
 	PUwindow: 10000 #8 # approximately the width of rising edge, in unit of ns
-	PUfraction: 0.05
+	PUfraction: 0.02
 	PUthreshold: 0.001 # unit: Volts
 	# Save S_time: 0
     # Save S_frequency: 0
@@ -144,7 +146,7 @@ Time stamp: 0
 # if SavePH = 1, save the pulse heights
 SavePH: 0
 
-PHD: 1
+PHD: 0
 	# if PHD = 1, plot the pulse height distribution
 	SavePHD: 0 # save the pulse height distribution
 	PHDBins: 200
@@ -159,21 +161,21 @@ PID: 1
 	SavePID: 0 # save the pulse height distribution
 	PIDBins: 200
 	PImin: 0 
-	PImax: 5000 # if 0, automatically set the plot range of PID
+	PImax: 0 # if 0, automatically set the plot range of PID
 	PreTrigger: 2000 #40 # ns # same value used in CoMPASS
 	PreGate: 1000 # ns  # same value used in CoMPASS
-	LongGate: 100000 # ns  # same value used in CoMPASS
+	LongGate: 50000 # ns  # same value used in CoMPASS
 
 PSD: 1
 	# if '1', plot tail integral / total integral vs total integral
 	ShortGate: 20000 # ns  # same value used in CoMPASS
 	SaveIntegrals: 0 # if '1', save the total and tail integrals
-	SavePSD: 1 # if'1', save PSD as a 2d histogram in txt.
+	SavePSD: 0 # if'1', save PSD as a 2d histogram in txt.
 	## plot options
 	PSDXBins: 100
 	PSDXmin: 0
-	PSDXmax: 5000
-	PSDYBins: 100
+	PSDXmax: 0
+	PSDYBins: 200
 	PSDYmin: 0 
 	PSDYmax: 1
 ################################################################################################

@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
         }
         std::cout <<"*****"<< std::endl;
 
-        readEvents(setting, coincidentEvents);
+        readEventsBuf(setting, coincidentEvents);
         std::cout << "*****Finished reading pulses. *****" << std::endl;
     }
     

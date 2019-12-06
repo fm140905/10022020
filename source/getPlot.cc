@@ -160,7 +160,9 @@ Int_t getPSD(TH2F *histo, TCanvas *canvas, const Parameters &setting, const std:
     // graph->GetYaxis()->SetTitle("PSD");
 
     // graph->Draw("Ap");
-    // histo -> GetYaxis()->SetRangeUser(0., 1.);
+    // histo -> GetYaxis()->SetRangeUser(0., 1);
+    // histo->SetStats(0);
+    canvas->SetLogz();
     histo -> Draw("COLZ");
     canvas -> Draw();
 

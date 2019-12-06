@@ -24,6 +24,9 @@ Int_t readCoincidences(const Parameters &setting,
 Int_t readEvents(const Parameters &setting,
                 std::vector<std::vector<Event>> &multichannelevents);
 
+Int_t readEventsBuf(const Parameters &setting,
+                std::vector<std::vector<Event>> &multichannelevents);
+
 Int_t getSampleNum(Parameters &setting);
 // Int_t newPulseHeight(const Parameters &setting,
 //                 std::vector< std::vector< Event > > &coincidentEvents);
