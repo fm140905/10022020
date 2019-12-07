@@ -12,12 +12,12 @@ VPATH = source
 OUT = bin/
 
 # OBJECTS = $(OUT)main.o $(OUT)getInputParameters.o $(OUT)output.o \
-#           $(OUT)readData.o $(OUT)getTimeStamp.o $(OUT)filterBad.o \
-# 		  $(OUT)filterPiledup.o $(OUT)getPHDPID.o $(OUT)tailVStotal.o
+#           $(OUT)readData.o $(OUT)coincidence.o $(OUT)getTimeStamp.o \
+# 		  $(OUT)rejection.o $(OUT)getPlot.o
 
-OBJECTS = $(OUT)main.o $(OUT)getInputParameters.o $(OUT)output.o \
-          $(OUT)readData.o $(OUT)coincidence.o $(OUT)getTimeStamp.o \
-		  $(OUT)rejection.o $(OUT)getPlot.o
+OBJECTS = $(OUT)main.o $(OUT)getInputParameters.o \
+          $(OUT)readData.o $(OUT)rejection.o $(OUT)getPlot.o \
+		  $(OUT)output.o
 
 
 
@@ -32,9 +32,14 @@ $(OUT)main: $(OBJECTS)
 
 	# The main.o target
 
+# $(OUT)main.o: main.cc getInputParameters.h events.h \
+#               output.h readData.h getTimeStamp.h \
+# 			  coincidence.h rejection.h getPlot.h
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS1)
+
 $(OUT)main.o: main.cc getInputParameters.h events.h \
-              output.h readData.h getTimeStamp.h \
-			  coincidence.h rejection.h getPlot.h
+              readData.h rejection.h getPlot.h \
+			  output.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS1)
 
 	# The getInputParameters.o target
@@ -42,26 +47,25 @@ $(OUT)main.o: main.cc getInputParameters.h events.h \
 $(OUT)getInputParameters.o: getInputParameters.cc getInputParameters.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 
+	# The readData.o target
+
+$(OUT)readData.o: readData.cc readData.h getInputParameters.h events.h
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 	# The output.o target
 
 $(OUT)output.o: output.cc output.h getInputParameters.h events.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 
-	# The readData.o target
+# 	# The coincidence.o target
 
-$(OUT)readData.o: readData.cc readData.h getInputParameters.h events.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
-
-	# The coincidence.o target
-
-$(OUT)coincidence.o: coincidence.cc coincidence.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
+# $(OUT)coincidence.o: coincidence.cc coincidence.h
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 
 
-	# The getTimeStamp.o target
+# 	# The getTimeStamp.o target
 
-$(OUT)getTimeStamp.o: getTimeStamp.cc getTimeStamp.h getInputParameters.h events.h
-	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
+# $(OUT)getTimeStamp.o: getTimeStamp.cc getTimeStamp.h getInputParameters.h events.h
+# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 
 	# The rejection.o target
 
@@ -72,26 +76,6 @@ $(OUT)rejection.o: rejection.cc rejection.h getInputParameters.h events.h
 
 $(OUT)getPlot.o: getPlot.cc getPlot.h getInputParameters.h events.h
 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
-
-	# The filterBad.o target
-
-# $(OUT)filterBad.o: filterBad.cc filterBad.h getInputParameters.h events.h
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
-
-	# The filterPiledup.o target
-
-# $(OUT)filterPiledup.o: filterPiledup.cc filterPiledup.h getInputParameters.h events.h
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS1)
-
-	# The getPHDPID.o target
-
-# $(OUT)getPHDPID.o: getPHDPID.cc getPHDPID.h getInputParameters.h events.h
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
-
-	# The tailVStotal.o target
-
-# $(OUT)tailVStotal.o: tailVStotal.cc tailVStotal.h getInputParameters.h events.h
-# 	$(CXX) $(CXXFLAGS) -c $< -o $@ $(LIBS2)
 
 .PHONY: clean
 

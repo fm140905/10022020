@@ -19,7 +19,8 @@ Int_t getTOF(TH1F *histo, TCanvas *canvas, const Parameters &setting, const std:
 
 Int_t getPSD(TH2F *histo, TCanvas *canvas, const Parameters &setting, const std::vector<Event> &events, const float_t calicoef, std::function<Bool_t(Event)> cond);
 
-Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, const std::string plotname, std::function<Bool_t(Event)> cond);
+// Int_t plotPulse(const Parameters &setting, const std::vector<Event> &events, const std::string plotname, std::function<Bool_t(Event)> cond);
+Int_t plotPulse(const Parameters &setting, const std::vector<std::vector< Float_t > > &Pulses,std::string plotname);
 
 //Int_t savePHD(TH1F *histo, TCanvas *canvas, const Parameters& setting, const std::string format);
 

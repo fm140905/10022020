@@ -14,9 +14,10 @@
 	#Directory: /media/ming/SeagateDrive/generator_test/Neutron_10ns_3kHz/FILTERED
 	#Directory: /media/ming/SeagateDrive/PALS_data/Co60_BC418/032119/Co60_23/FILTERED
 	#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
-	Directory: /media/ming/SeagateDrive/clyc_detector/PuBe_source_data
+	#Directory: /media/ming/SeagateDrive/clyc_detector/PuBe_source_data
 	#Directory: /media/ming/SeagateDrive/active_interrogation/day2/active_25rods_day2_1h_good/FILTERED
 	#Directory: /home/ming/Downloads
+	Directory: /media/ming/SeagateDrive/active_interrogation/overnight_run_2/FILTERED
 	# Folders: two comma-separated integers or one integer.
 		# example: 10 folders from No.0 to No.9: 0, 9
 		#	  		only 1 folder No.1: 1
@@ -24,7 +25,7 @@
 
 	# Channels: specify the channels to process
 		# example: Channel 0 and Channel 4: 0, 4
-	Channels: 0
+	Channels: 4
 
 	# Filetype
 		# example: binary, FILETYPE = 0;
@@ -32,7 +33,7 @@
 	Filetype: 0
 
 	# Maximum number of pulses to process
-	MaxNumPulses: 10000
+	MaxNumPulses: 200000
 
 ############################################################################################
 
@@ -46,12 +47,12 @@ Headersize: 2, 2, 8, 2, 2, 4, 4 # size of each header in bytes, fixed
 	# Board, Channel, Time Stamps, Energy(ch), Energy Short(ch), Flags, Number of Samples
 SaveHeaders: 0, 0, 0 # save Time stamps, Energy(ch), Energy Short(ch)
 Samplesize: 2 # size of each sample in bytes, fixed
-Polarity: 1 # polarity of the pulse: -1 for negative, +1 for positive
+Polarity: -1 # polarity of the pulse: -1 for negative, +1 for positive
 
 # Digitizer-specific
 Dynamicrange: 2.0 # unit: Volt
 Resolultion: 14 #12 bits # number of bits of ADC
-Delt: 4 #2 # sampling time, unit: ns
+Delt: 2 #2 # sampling time, unit: ns
 Offset: 8 # number of samples needed to calculate the baseline
 SavePulses: 0 # if SavePulses = N, save the first N good pulses.
 
@@ -60,23 +61,6 @@ SavePulses: 0 # if SavePulses = N, save the first N good pulses.
 
 ################################### Post-Processing Starts ##################################
 
-####################################### Coincidence ###########################################
-
-# if Coincidence = 1, use the time stamp in the header to find the coincidences
-# if coincidence = 0, skip
-
-Coincidence: 0
-	# Channels
-	Coincidence Channels: 0, 1
-	Time Window: 200 #ns
-		# if DT < Time Window, we find a pair of coincident events.
-	SaveDT: 0 # whether to save the time differences
-	TOF: 0 # whether to plot the TOF spectrum
-	# if TOF = 1
-		SaveTOF: 0 # whether to save the TOF spectrum
-
-################################################################################################
-
 ####################################### Energy Calibration #####################################
 
 # specify the energy calibration coefficents
@@ -84,10 +68,10 @@ Coincidence: 0
 # the calibration coefficient is calculated using a Matlab script.
 
 # energy = total integral * CalibrationPID
-CalibrationPID: 1 #175.6707 #166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
+CalibrationPID: 1 #166.8994 #166.8994 #355 #153.5496, 158.0688 #88.9137, 89.0628 # 110.9563, 110.1382 #152.0356, 151.746
 
 # energy = pulse height * CalibrationPHD
-CalibrationPHD: 1
+CalibrationPHD: 1, 1
 ################################################################################################
 
 ####################################### Pulse Rejection ########################################
@@ -108,9 +92,9 @@ Filter bad: 1
 Filter piled-up: 1
 	# If filter piled-up =1
 	Save piled-up: 0 # if Save bad = N, save the first N bad pulses.
-	PUwindow: 10000 #8 # approximately the width of rising edge, in unit of ns
-	PUfraction: 0.02
-	PUthreshold: 0.001 # unit: Volts
+	PUwindow: 8 #8 # approximately the width of rising edge, in unit of ns
+	PUfraction: 0.1
+	PUthreshold: 0.01 # unit: Volts
 	# Save S_time: 0
     # Save S_frequency: 0
 
@@ -125,20 +109,6 @@ EnergyHigh: 2000 # unit: keVee
 PSDCut: 0, 0
 PSDLow: 0, 0.2
 PSDHigh: 1, 0.35
-################################################################################################
-
-####################################### Calculate the time stamps ##############################
-
-Time stamp: 0
-	# if time stamp =1, calculate time stamps using DIACFD
-	Interpolation: 0 # number of interpolation points to add between two samples
-	TRise: 20 # about 2 * pulse rise time (ns)
-	#DIACFD parameters
-		Fraction: 0.4 # range from 0 to 1.
-		#Filter Width: 1
-		Time Delay: 4 #16 # unit: ns
-    SaveTimeStamp: 0 # if '1', save the time stamps of good pulses
-
 ################################################################################################
 
 ####################################### Plots ##################################################		
@@ -158,27 +128,62 @@ SavePI: 0
 
 PID: 1
 	# if PID = 1, plot the pulse integral distribution
-	SavePID: 0 # save the pulse height distribution
+	SavePID: 1 # save the pulse height distribution
 	PIDBins: 200
 	PImin: 0 
-	PImax: 0 # if 0, automatically set the plot range of PID
-	PreTrigger: 2000 #40 # ns # same value used in CoMPASS
-	PreGate: 1000 # ns  # same value used in CoMPASS
-	LongGate: 50000 # ns  # same value used in CoMPASS
+	PImax: 2000 # if 0, automatically set the plot range of PID
+	PreTrigger: 40 #40 # ns # same value used in CoMPASS
+	PreGate: 10 # ns  # same value used in CoMPASS
+	LongGate: 250 # ns  # same value used in CoMPASS
 
 PSD: 1
 	# if '1', plot tail integral / total integral vs total integral
-	ShortGate: 20000 # ns  # same value used in CoMPASS
+	ShortGate: 30 # ns  # same value used in CoMPASS
 	SaveIntegrals: 0 # if '1', save the total and tail integrals
 	SavePSD: 0 # if'1', save PSD as a 2d histogram in txt.
 	## plot options
-	PSDXBins: 100
+	PSDXBins: 200
 	PSDXmin: 0
-	PSDXmax: 0
+	PSDXmax: 2000
 	PSDYBins: 200
 	PSDYmin: 0 
 	PSDYmax: 1
 ################################################################################################
 
-## No longer used 
+############################ No longer used ####################################################
+
 ## NSamples: 104 # number of samples in one pulse
+
+############################### To be implemented #############################################
+
+####################################### Coincidence ###########################################
+
+# if Coincidence = 1, use the time stamp in the header to find the coincidences
+# if coincidence = 0, skip
+
+# Coincidence: 0
+#	# Channels
+#	Coincidence Channels: 0, 1
+#	Time Window: 200 #ns
+#		# if DT < Time Window, we find a pair of coincident events.
+#	SaveDT: 0 # whether to save the time differences
+#	TOF: 0 # whether to plot the TOF spectrum
+#	# if TOF = 1
+#		SaveTOF: 0 # whether to save the TOF spectrum
+
+################################################################################################
+
+
+####################################### Calculate the time stamps ##############################
+
+# Time stamp: 0
+#	# if time stamp =1, calculate time stamps using DIACFD
+#	Interpolation: 0 # number of interpolation points to add between two samples
+#	TRise: 20 # about 2 * pulse rise time (ns)
+#	#DIACFD parameters
+#		Fraction: 0.4 # range from 0 to 1.
+#		#Filter Width: 1
+#		Time Delay: 4 #16 # unit: ns
+#   SaveTimeStamp: 0 # if '1', save the time stamps of good pulses
+
+################################################################################################

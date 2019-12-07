@@ -14,7 +14,8 @@ Int_t savePH(const Parameters &setting, std::vector<Event> &events, std::string 
 
 Int_t savePI(const Parameters &setting, std::vector<Event> &events, std::string outName, std::function<Bool_t(Event)> cond);
 
-Int_t savePulses(const Parameters &setting, std::vector<Event> &events, const Int_t maxNum,std::string outName, std::function<Bool_t(Event)> cond);
+// Int_t savePulses(const Parameters &setting, std::vector<Event> &events, const Int_t maxNum,std::string outName, std::function<Bool_t(Event)> cond);
+Int_t savePulses(const UInt_t numSave, const std::vector<std::vector< Float_t > > &Pulses,std::string outName);
 
 Int_t saveTimestamp(const std::vector<Event> &events, std::string outName, std::string timestampname, std::function<Bool_t(Event)> cond);
 
