@@ -12,7 +12,7 @@ struct Event
     UShort_t egrShort = 0; // short int from CoMPASS, ch
 
     Double_t timeStampDACFD = 0;
-    std::vector<Float_t> voltage;
+    // std::vector<Float_t> voltage;
     // std::vector<Short_t> samples;
     Float_t height = 0;
     UShort_t heightindex = 0;

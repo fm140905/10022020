@@ -50,7 +50,7 @@ Int_t savePH(const Parameters &setting, std::vector<Event> &events, std::string 
     {
         if (cond(events[i]))
         {
-            PHFile << *(events[i].voltage.begin() + events[i].heightindex) << std::endl;
+            PHFile << events[i].height << std::endl;
         }
     }
     PHFile.close();
@@ -73,21 +73,39 @@ Int_t savePI(const Parameters &setting, std::vector<Event> &events, std::string 
     return 0;
 }
 
-Int_t savePulses(const Parameters &setting, std::vector<Event> &events, const Int_t maxNum, std::string outName, std::function<Bool_t(Event)> cond)
+// Int_t savePulses(const Parameters &setting, std::vector<Event> &events, const Int_t maxNum, std::string outName, std::function<Bool_t(Event)> cond)
+// {
+//     Int_t counts(0);
+//     std::ofstream voltageFile(outName.c_str());
+//     for (int i = 0; counts < maxNum && i < events.size(); i++)
+//     {
+//         if (cond(events[i]))
+//         {
+//             for (int j = 0; j < events[i].voltage.size(); j++)
+//             {
+//                 voltageFile << events[i].voltage[j] << '\t';
+//             }
+//             voltageFile << std::endl;
+//             counts++;
+//         }
+//     }
+//     voltageFile.close();
+//     std::cout << counts << " pulses are saved to file " << outName << "!" << std::endl;
+
+//     return 0;
+// }
+Int_t savePulses(const UInt_t numSave, const std::vector<std::vector< Float_t > > &Pulses,std::string outName)
 {
     Int_t counts(0);
     std::ofstream voltageFile(outName.c_str());
-    for (int i = 0; counts < maxNum && i < events.size(); i++)
+    for (int i = 0; counts < numSave && i < Pulses.size(); i++)
     {
-        if (cond(events[i]))
+        for (int j = 0; j < Pulses[i].size(); j++)
         {
-            for (int j = 0; j < events[i].voltage.size(); j++)
-            {
-                voltageFile << events[i].voltage[j] << '\t';
-            }
-            voltageFile << std::endl;
-            counts++;
+            voltageFile << Pulses[i][j] << '\t';
         }
+        voltageFile << std::endl;
+        counts++;
     }
     voltageFile.close();
     std::cout << counts << " pulses are saved to file " << outName << "!" << std::endl;

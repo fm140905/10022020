@@ -1,6 +1,6 @@
 #include "rejection.h"
 
-Int_t rejection(const Parameters &setting, std::vector<Event> &events)
+Int_t rejection(const Parameters &setting, const ULong_t start, std::vector< Event >& events, const std::vector<std::vector< Float_t > > &Pulses)
 {
     //std::vector<Int_t> BadIndexes;
     Int_t badnumber(0);
@@ -9,7 +9,12 @@ Int_t rejection(const Parameters &setting, std::vector<Event> &events)
     // const Float_t fraction = setting.Rejection;
 
     // std::cout << "Start filtering bad pulses !" << std::endl;
-
+    if (Pulses.size()+start != events.size())
+    {
+        std::cout << "Error when reading data!" << std::endl;
+        exit(1);
+    }
+    
     if (!setting.FilterBad)
     {
         std::cout << "You choose not to filter bad pulses !" << std::endl;
@@ -17,47 +22,47 @@ Int_t rejection(const Parameters &setting, std::vector<Event> &events)
     }
 
     // filter bad pulses
-    for (int i = 0; i < events.size(); i++)
+    for (int i = 0; i < Pulses.size(); i++)
     {
-        indexTemp = events[i].heightindex;
-        heightTemp = events[i].voltage[indexTemp];
+        indexTemp = events[i+start].heightindex;
+        heightTemp = events[i+start].height;
 
         //zero supression
         if (setting.ZeroSupression && heightTemp < setting.MinVoltage)
         {
-            events[i].isBad = true;
+            events[i+start].isBad = true;
         }
 
         // filter clipped pulses
-        if (!events[i].isBad)
+        if (!events[i+start].isBad)
         {
             if (setting.Clipped &&
-                (events[i].voltage[indexTemp - 1] == heightTemp ||
-                 events[i].voltage[indexTemp + 1] == heightTemp))
+                (Pulses[i][indexTemp - 1] == heightTemp ||
+                 Pulses[i][indexTemp + 1] == heightTemp))
             {
-                events[i].isBad = true;
+                events[i+start].isBad = true;
             }
         }
 
         // filter baseline-shifted pulses
-        if (!events[i].isBad)
+        if (!events[i+start].isBad)
         {
             for (int j = 0; j < setting.Offset; j++)
             {
-                if (events[i].voltage[j] > heightTemp * 0.05 /*setting.MinVoltage*/)
+                if (Pulses[i][j] > heightTemp * 0.05 /*setting.MinVoltage*/)
                 {
-                    events[i].isBad = true;
+                    events[i+start].isBad = true;
                     break;
                 }
             }
         }
-        if (!events[i].isBad)
+        if (!events[i+start].isBad)
         {
             for (int j = indexTemp+1; j < setting.NSamples; j++)
             {
-                if (events[i].voltage[j] < -0.05 * heightTemp /*setting.MinVoltage*/)
+                if (Pulses[i][j] < -0.05 * heightTemp /*setting.MinVoltage*/)
                 {
-                    events[i].isBad = true;
+                    events[i+start].isBad = true;
                     break;
                 }
             }
@@ -78,14 +83,14 @@ Int_t rejection(const Parameters &setting, std::vector<Event> &events)
         //     }
         // }
 
-        if (events[i].isBad)
+        if (events[i+start].isBad)
         {
             //BadIndexes.push_back(i);
             badnumber++;
         }
     }
 
-    std::cout << " " << badnumber << " bad pulses are found!" << std::endl;
+    std::cout << " " << badnumber << " bad, ";
     //save bad pulses
     /*
     if(setting.SaveBad)
@@ -137,67 +142,68 @@ Int_t PSDCut(const Parameters &setting, const UInt_t index, std::vector< Event >
                 events[i].isGamma = true;
                 events[i].isBad = true;
             }
-            
         }
     }
     return 0;
 }
 
-Int_t simplePUR(const Parameters &setting, const UInt_t index, std::vector< Event >& events )
+Int_t simplePUR(const Parameters &setting, const ULong_t start, std::vector< Event >& events, const std::vector<std::vector< Float_t > > &Pulses)
 {
     if (!setting.FilterPiledup)
     {
-        std::cout << "You choose not to filter pile-up pulses !" << std::endl;
+        std::cout << "0 pile-up, ";
         return 0;
     }
 
     Int_t badnumber(0);
     Int_t indexTemp(0);
     Float_t heightTemp(0);
+    ULong_t ii(0);
     const int dpjump = setting.PUwindow / setting.Delt; // data point jump, ~ rising edge
     const float dpf = setting.PUfraction; // double pulse fraction
     const float threshV = setting.PUthreshold; // the noise level
     float deltaV = 0;
-    for (int i = 0; i < events.size(); i++)
+    for (int i = 0; i < Pulses.size(); i++)
     {
-        if (events[i].isBad)
+        ii = i+start;
+        if (events[ii].isBad)
         {
             continue;
         }
-        indexTemp = events[i].heightindex;
-        heightTemp = events[i].height;
+        indexTemp = events[ii].heightindex;
+        heightTemp = events[ii].height;
         
-        for (int j = indexTemp; j < events[i].voltage.size() - dpjump; j++)
+        for (int j = indexTemp; j < Pulses[i].size() - dpjump; j++)
         {
             // detect the rising edge of the second pulse that occurs after the triggering pulse
-            deltaV = events[i].voltage[j+dpjump] - events[i].voltage[j];
+            deltaV = Pulses[i][j+dpjump] - Pulses[i][j];
             // threshV = 
             if (deltaV > dpf * heightTemp && deltaV > threshV) // && deltaV > setting.MinVoltage[0])
             {
-                events[i].isPiled = true;
-                events[i].isBad = true;
+                events[ii].isPiled = true;
+                events[ii].isBad = true;
                 badnumber ++;
                 break;
             }
         }
-        if (events[i].isBad)
+        if (events[ii].isBad)
         {
             continue;
         }
         for (int j = 0; j < indexTemp - 2 * dpjump; j++)
         {
             // detect the rising edge of the second pulse that occurs before the triggering pulse
-            deltaV = events[i].voltage[j+dpjump] - events[i].voltage[j];
+            deltaV = Pulses[i][j+dpjump] - Pulses[i][j];
             // threshV = 
             if (deltaV > dpf * heightTemp && deltaV > threshV) // && deltaV > setting.MinVoltage[0])
             {
-                events[i].isPiled = true;
-                events[i].isBad = true;
+                events[ii].isPiled = true;
+                events[ii].isBad = true;
                 badnumber ++;
                 break;
             }
         }
     }
-    std::cout << " " << badnumber << " pile-up pulses are found!" << std::endl;
+    std::cout << " " << badnumber << " pile-up, ";
     return 0;
 }
